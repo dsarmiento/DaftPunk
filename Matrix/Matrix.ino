@@ -13,10 +13,8 @@
 #define clockPin 12 //Pin connected to SH_CP of 74HC595
 #define dataPin 11  //Pin connected to DS of 74HC595
 
-int option = 1;
-byte data[8][6]; // 0 - Rows; 5 - Col4
-
-
+int option = 4;
+boolean flag = true;
 
 // First time setup
 void setup() 
@@ -26,6 +24,7 @@ void setup()
     pinMode(clockPin, OUTPUT);
     pinMode(dataPin, OUTPUT);
     digitalWrite(latchPin, HIGH);
+    Serial.begin(9600);
 }
 
 // For counter option
@@ -35,7 +34,7 @@ int cnt = 0;
 int steps = 0;
 byte temp[5];
 byte ch;
-char msg[256] = "HELLO WORLD"; // HELLO WORLD
+char msg[256] = "HUMAN      "; // HELLO WORLD
 int msgLen = 0;
 
 void loop()
@@ -45,8 +44,10 @@ void loop()
   {
     char in = Serial.read();
     option = (int)in - '0';
+    Serial.println(option);
     if(option == 1)
     {
+      flag = true;
       Serial.print("OK");
       while(Serial.available() == 0);
       String message = Serial.readString();
@@ -65,10 +66,27 @@ void loop()
   {
     marquee(msg);
   }
+  else if(option == 2)
+  {
+    heart();
+  }
+  else if(option == 3)
+  {
+    roboCop(15);
+  }
+  else if(option == 4)
+  {
+    noise();
+  }
 }
 
 void countUp(int cnt)
 {
+  uint8_t data[8][6];
+  for(int i = 0; i < 8; i++)
+    for(int j = 0; j < 6; j++)
+      data[i][j] = 0x00;
+
     // Wrap over counter
     if(cnt > 9999)
         cnt = 0;  
@@ -118,6 +136,15 @@ void countUp(int cnt)
 
 void marquee(char msg[])
 {
+  uint8_t data[8][6];
+  if(flag)
+  {
+    flag = false;
+    for(int i = 0; i < 8; i++)
+      for(int j = 0; j < 6; j++)
+        data[i][j] = 0x00;
+  }
+      
     for(int i = 0; i < 8; i++){
       ch = 0;
       if(steps % 6 != 5){  
@@ -159,16 +186,112 @@ void marquee(char msg[])
     steps++;  
 }
 
-void blink()
+void roboCop(int timerDelay)
 {
-  
+  uint8_t data[8][6];
+  uint8_t robo[5] = {B11110000, B00000000, B00000000, B00000000, B00000000};
+  uint8_t temp[5];
+
+  for(int i = 0; i < 36; i++)
+  {
+    temp[0] = robo[0] & B00000001;
+    temp[1] = robo[1] & B00000001;
+    temp[2] = robo[2] & B00000001;
+    temp[3] = robo[3] & B00000001;
+    temp[4] = robo[4] & B00000001;
+    
+    robo[0] >>= 1;
+    robo[1] >>= 1;
+    robo[2] >>= 1;
+    robo[3] >>= 1;
+    robo[4] >>= 1;
+    
+    robo[1] |= temp[0] << 7;
+    robo[2] |= temp[1] << 7;
+    robo[3] |= temp[2] << 7;
+    robo[4] |= temp[3] << 7;
+    
+    for(int j = 0; j < 8; j++)
+    {
+      data[j][0] = 1 << j;
+      data[j][1] = robo[0];
+      data[j][2] = robo[1];
+      data[j][3] = robo[2];
+      data[j][4] = robo[3];
+      data[j][5] = robo[4];
+    }
+    sendScreen(data, timerDelay);
+  }
+
+  for(int i = 0; i < 36; i++)
+  {
+    temp[0] = robo[0] & B10000000;
+    temp[1] = robo[1] & B10000000;
+    temp[2] = robo[2] & B10000000;
+    temp[3] = robo[3] & B10000000;
+    temp[4] = robo[4] & B10000000;
+    
+    robo[0] <<= 1;
+    robo[1] <<= 1;
+    robo[2] <<= 1;
+    robo[3] <<= 1;
+    robo[4] <<= 1;
+    
+    robo[0] |= temp[1] >> 7;
+    robo[1] |= temp[2] >> 7;
+    robo[2] |= temp[3] >> 7;
+    robo[3] |= temp[4] >> 7;
+    
+    for(int j = 0; j < 8; j++)
+    {
+      data[j][0] = 1 << j;
+      data[j][1] = robo[0];
+      data[j][2] = robo[1];
+      data[j][3] = robo[2];
+      data[j][4] = robo[3];
+      data[j][5] = robo[4];
+    }
+    sendScreen(data, timerDelay);
+  }
 }
 
+void heart()
+{
+  uint8_t data[8][6];
+  uint8_t mask[5] = {B00000000, B00000000, B00000000, B00000000, B00000000};
+  for(int j = 0; j < 40; j++)
+  {
+    mask[j / 8] |= 1 << 7 - (j % 8);
+    for(int i = 0; i < 8; i++)
+    {
+      data[i][0] = 1 << i;
+      data[i][1] = heartbeat[i][0] & mask[0];
+      data[i][2] = heartbeat[i][1] & mask[1];
+      data[i][3] = heartbeat[i][2] & mask[2];
+      data[i][4] = heartbeat[i][3] & mask[3];
+      data[i][5] = heartbeat[i][4] & mask[4];
+    }
+    sendScreen(data, 25);
+  }
+}
 
-void sendScreen(uint8_t data[8][6], int delay)
+void noise()
+{
+  uint8_t data[8][6];
+  for(int i = 0; i < 8; i++)
+  {
+    data[i][0] = 1 << i;
+    for(int j = 1; j < 6; j++)
+    {
+      data[i][j] = random(256);
+    }
+  }
+  sendScreen(data, 50e);
+}
+void sendScreen(uint8_t data[8][6], int timerDelay)
 {
     long timer = millis();
-    while(millis() < timer + delay)
+    while(millis() < timer + timerDelay)
     {
         for(int i = 0; i < 8; i++)
         {

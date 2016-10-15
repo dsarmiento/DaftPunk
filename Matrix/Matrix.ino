@@ -1,9 +1,14 @@
-/* Made numbers for the matrix
- * Starting clock code soon (make it loop through 00:00 - 99:99 in a short time span)
- * Data being sent to registers are 48 Bits or 6 Bytes, 1 Byte for row and 5 for columns
- * Data transmitted must be in the order of Col4, Col3, Col2, Col1, Col0, Rows (last shift is first register)
- * Data transmitted must be inverted for Col0-4 (since we need to drive the ones we want on LOW for GND
- * wrote everything as if it would be driven HIGH for my own sanity
+/* Daniel Sarmiento
+ * Code for my Thomas Daft Punk Visor
+ * Current animations:
+ * 0 Count up timer
+ * 1 Marquee
+ * 2 Heart beat
+ * 3 Heart blink
+ * 4 RoboCop
+ * 5 White noise
+ * 6 Blinking eyes
+ * 7 Static text
  */
 
 #include "Const.h" 
@@ -13,7 +18,7 @@
 #define clockPin 12 //Pin connected to SH_CP of 74HC595
 #define dataPin 11  //Pin connected to DS of 74HC595
 
-int option = 4;
+int option = 3;
 boolean flag = true;
 
 // First time setup
@@ -35,6 +40,7 @@ int steps = 0;
 byte temp[5];
 byte ch;
 char msg[256] = "HUMAN      "; // HELLO WORLD
+char txt[6]   = "HUMAN";
 int msgLen = 0;
 
 void loop()
@@ -68,15 +74,27 @@ void loop()
   }
   else if(option == 2)
   {
-    heart();
+    heartBeat();
   }
   else if(option == 3)
   {
-    roboCop(15);
+    heartBlink();
   }
   else if(option == 4)
   {
+    roboCop(15);
+  }
+  else if(option == 5)
+  {
     noise();
+  }
+  else if(option == 6)
+  {
+    eyes();
+  }
+  else if(option == 7)
+  {
+    text(txt)
   }
 }
 
@@ -152,7 +170,7 @@ void marquee(char msg[])
         if(msg[(steps/6)%msgLen] != ' '){
           ch = alphabet[msg[(steps/6)%msgLen] - 'A'][i];
           ch >>= pos;
-          ch &= 1;
+          ch &= 0x01;
         }else{
           ch = 0;
         }
@@ -189,16 +207,16 @@ void marquee(char msg[])
 void roboCop(int timerDelay)
 {
   uint8_t data[8][6];
-  uint8_t robo[5] = {B11110000, B00000000, B00000000, B00000000, B00000000};
+  uint8_t robo[5] = {0xF0, 0x00, 0x00, 0x00, 0x00};
   uint8_t temp[5];
 
   for(int i = 0; i < 36; i++)
   {
-    temp[0] = robo[0] & B00000001;
-    temp[1] = robo[1] & B00000001;
-    temp[2] = robo[2] & B00000001;
-    temp[3] = robo[3] & B00000001;
-    temp[4] = robo[4] & B00000001;
+    temp[0] = robo[0] & 0x01;
+    temp[1] = robo[1] & 0x01;
+    temp[2] = robo[2] & 0x01;
+    temp[3] = robo[3] & 0x01;
+    temp[4] = robo[4] & 0x01;
     
     robo[0] >>= 1;
     robo[1] >>= 1;
@@ -225,11 +243,11 @@ void roboCop(int timerDelay)
 
   for(int i = 0; i < 36; i++)
   {
-    temp[0] = robo[0] & B10000000;
-    temp[1] = robo[1] & B10000000;
-    temp[2] = robo[2] & B10000000;
-    temp[3] = robo[3] & B10000000;
-    temp[4] = robo[4] & B10000000;
+    temp[0] = robo[0] & 0x80;
+    temp[1] = robo[1] & 0x80;
+    temp[2] = robo[2] & 0x80;
+    temp[3] = robo[3] & 0x80;
+    temp[4] = robo[4] & 0x80;
     
     robo[0] <<= 1;
     robo[1] <<= 1;
@@ -255,10 +273,10 @@ void roboCop(int timerDelay)
   }
 }
 
-void heart()
+void heartBeat()
 {
   uint8_t data[8][6];
-  uint8_t mask[5] = {B00000000, B00000000, B00000000, B00000000, B00000000};
+  uint8_t mask[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
   for(int j = 0; j < 40; j++)
   {
     mask[j / 8] |= 1 << 7 - (j % 8);
@@ -275,6 +293,66 @@ void heart()
   }
 }
 
+void heartBlink()
+{
+  uint8_t data[8][6];
+  if((millis()/500) % 2 == 0)
+  {
+    for(int i = 0; i < 8; i++)
+    {
+      data[i][0] = 1 << i;
+      if(i != 7)
+      {
+        data[i][1]  = heartEmpty[i][0];
+        data[i][2]  = heartEmpty[i][1];
+        data[i][2] |= heartEmpty[i][0] >> 7;
+        data[i][3]  = heartEmpty[i][0] << 1;
+        data[i][3] |= heartEmpty[i][1] >> 7;
+        data[i][4]  = heartEmpty[i][1] << 1;
+        data[i][4] |= heartEmpty[i][0] >> 6;
+        data[i][5]  = heartEmpty[i][0] << 2;
+        data[i][5] |= heartEmpty[i][1] >> 6;
+      }
+      else
+      {
+        data[i][1] = 0x00;
+        data[i][2] = 0x00;
+        data[i][3] = 0x00;
+        data[i][4] = 0x00;
+        data[i][5] = 0x00;
+      }
+    }
+  }
+  else
+  {
+    for(int i = 0; i < 8; i++)
+    {
+      data[i][0] = 1 << i;
+      if(i != 7)
+      {
+        data[i][1]  = heartFull[i][0];
+        data[i][2]  = heartFull[i][1];
+        data[i][2] |= heartFull[i][0] >> 7;
+        data[i][3]  = heartFull[i][0] << 1;
+        data[i][3] |= heartFull[i][1] >> 7;
+        data[i][4]  = heartFull[i][1] << 1;
+        data[i][4] |= heartFull[i][0] >> 6;
+        data[i][5]  = heartFull[i][0] << 2;
+        data[i][5] |= heartFull[i][1] >> 6;
+      }
+      else
+      {
+        data[i][1] = 0x00;
+        data[i][2] = 0x00;
+        data[i][3] = 0x00;
+        data[i][4] = 0x00;
+        data[i][5] = 0x00;
+      }
+    }
+  }
+  sendScreen(data, 50);
+}
+
 void noise()
 {
   uint8_t data[8][6];
@@ -286,8 +364,104 @@ void noise()
       data[i][j] = random(256);
     }
   }
-  sendScreen(data, 50e);
+  sendScreen(data, 50);
 }
+
+void eyes()
+{
+  uint8_t data[8][6];
+  for(int k = 0; k < 4; k++)
+  {
+    for(int i = 0; i < 8; i++)
+    {
+      data[i][0] = 1 << i;
+      for(int j = 1; j < 6; j++)
+      {
+        
+        data[i][j] = blinking[k][i][j-1];
+      }
+    }
+    if(k == 0)
+      sendScreen(data, random(5) * 1000);
+    else
+      sendScreen(data, 100);
+  }
+  for(int k = 3; k > 0; k--)
+  {
+    for(int i = 0; i < 8; i++)
+    {
+      data[i][0] = 1 << i;
+      for(int j = 1; j < 6; j++)
+      {
+        
+        data[i][j] = blinking[k][i][j-1];
+      }
+    }
+    sendScreen(data, 100);
+  }
+}
+
+void text(char txt[6])
+{
+  for(int i = 0; i < 8; i++)
+  {
+    data[i][0]  = 1 << i;
+    if(msg[0] != ' ')
+    {
+      data[i][1]  = alphabet[txt[0] - 'A'][i];
+    }
+    else
+    {
+      data[i][1]  = 0x00;
+    }
+    if(msg[1] != ' ')
+    {
+      data[i][2]  = alphabet[txt[1] - 'A'][i] << 2;
+    }
+    else
+    {
+      data[i][2]  = 0x00;
+    }
+    if(msg[2] != ' ')
+    {
+      data[i][2] |= alphabet[txt[2] - 'A'][i] >> 4;
+      data[i][3]  = alphabet[txt[2] - 'A'][i] << 4;
+    }
+    else
+    {
+      data[i][2] &= ~0x03;
+      data[i][3]  = 0x00; 
+    }
+    if(msg[3] != ' ')
+    {
+      data[i][3] |= alphabet[msg[3] - 'A'][i] >> 2;
+      data[i][4]  = alphabet[msg[3] - 'A'][i] << 6;
+    }
+    else
+    {
+      data[i][3] &= ~0x0F;
+      data[i][4]  = 0x00;
+    }
+    if(msg[4] != ' ')
+    {
+      data[i][4] |= alphabet[txt[4] - 'A'][i];
+    }
+    else
+    {
+      data[i][4] &= ~0x3F;
+    }
+    if(msg[5] != ' ')
+    {
+      data[i][5]  = alphabet[txt[5] - 'A'][i] << 2;
+    }
+    else
+    {
+      data[i][5]  = 0x00;
+    }
+  }
+  sendScreen(data, 50);
+}
+
 void sendScreen(uint8_t data[8][6], int timerDelay)
 {
     long timer = millis();

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Daft Controller</string>
+    <string name="robo_cop">Robo Cop</string>
+    <string name="heart_beat">Heart Beat</string>
+    <string name="heart_blink">Blinking Hearts</string>
+    <string name="marquee">Marquee</string>
+    <string name="white_noise">Random</string>
+    <string name="static_text">Text</string>
+    <string name="blinking_eyes">Eyes</string>
 </resources>

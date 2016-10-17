@@ -11,10 +11,82 @@
     tools:context="com.dsarmiento.daftcontroller.ControllerMain">
 
     <ToggleButton
-        android:text="RoboCop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/toggleButton"
+        android:text="@string/robo_cop"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/roboCop"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textOff="@string/robo_cop"
+        android:textOn="@string/robo_cop"
+        style="@style/AppTheme"
+        android:checked="false" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/roboCop"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:id="@+id/whiteNoise"
+        android:textOff="@string/white_noise"
+        android:textOn="@string/white_noise"
+        android:text="@string/white_noise"
+        style="@style/AppTheme" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/heartBeat"
+        android:textOff="@string/heart_beat"
+        android:textOn="@string/heart_beat"
+        android:text="@string/heart_beat"
+        style="@style/AppTheme"
+        android:layout_marginStart="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/roboCop" />
+
+    <ToggleButton
+        android:text="@string/blinking_eyes"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/heartBeat"
+        android:layout_marginStart="10dp"
+        android:id="@+id/blinkingEyes"
+        android:textOff="@string/blinking_eyes"
+        android:textOn="@string/blinking_eyes" />
+
+
+    <ToggleButton
+        android:text="@string/static_text"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/staticText"
+        android:textOff="@string/static_text"
+        android:textOn="@string/static_text"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/blinkingEyes"
+        android:layout_marginStart="10dp" />
+
+    <ToggleButton
+        android:text="@string/marquee"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/marqueeText"
+        android:textOff="@string/marquee"
+        android:textOn="@string/marquee"
+        android:layout_alignTop="@+id/heartBlink"
+        android:layout_alignStart="@+id/staticText" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/heartBlink"
+        android:textOff="@string/heart_blink"
+        android:textOn="@string/heart_blink"
+        android:text="@string/heart_blink"
+        style="@style/AppTheme"
+        android:layout_alignTop="@+id/whiteNoise"
+        android:layout_alignStart="@+id/heartBeat" />
 </RelativeLayout>

@@ -168,7 +168,6 @@
             android:layout_weight="0.74">
 
             <EditText
-                android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:ems="10"
                 android:layout_marginBottom="45dp"
@@ -176,15 +175,16 @@
                 android:hint="Message"
                 android:singleLine="true"
                 android:layout_width="0dp"
-                android:layout_weight="75" />
+                android:layout_weight="75"
+                android:layout_height="55dp" />
 
             <Button
                 android:text="Send"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:id="@+id/sendButton"
                 android:elevation="0dp"
-                android:layout_weight="25" />
+                android:layout_weight="25"
+                android:layout_height="55dp" />
         </LinearLayout>
 
     </LinearLayout>

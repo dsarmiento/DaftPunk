@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,19 +15,30 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.UUID;
 
 
 public class ControllerMain extends AppCompatActivity {
     private LinkedList<ToggleButton> toggleButtons;
     private static int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothDevice mBluetoothDevice;
+    private BluetoothSocket mBluetoothSocket;
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private boolean isBtConnected = false;
+
+    private AlertDialog ad;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -189,9 +202,27 @@ public class ControllerMain extends AppCompatActivity {
             }
 
             lv.setAdapter(adapter);
-            alertDialog.show();
+            lv.setOnItemClickListener(myListClickListener);
+            ad = alertDialog.show();
+
         }
     }
+
+    private AdapterView.OnItemClickListener myListClickListener = new AdapterView.OnItemClickListener()
+    {
+        public void onItemClick (AdapterView<?> av, View v, int arg2, long arg3)
+        {
+            ad.dismiss();
+            // Get the device MAC address, the last 17 chars in the View
+            String info = ((TextView) v).getText().toString();
+            String address = info.substring(info.length() - 17);
+
+            mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(address);
+            new ConnectBT().execute();
+
+
+        }
+    };
 
     private void testDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(ControllerMain.this);
@@ -211,6 +242,51 @@ public class ControllerMain extends AppCompatActivity {
 
         lv.setAdapter(adapter);
         alertDialog.show();
+    }
+
+
+    private class ConnectBT extends AsyncTask<Void, Void, Void> {
+        private boolean ConnectSuccess = true; //if it's here, it's almost connected
+
+        @Override
+        protected void onPreExecute()
+        {
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... devices) //while the progress dialog is shown, the connection is done in background
+        {
+            try
+            {
+                if (mBluetoothSocket == null || !isBtConnected)
+                {
+                    mBluetoothSocket = mBluetoothDevice.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
+                    mBluetoothSocket.connect();//start connection
+                }
+            }
+            catch (IOException e)
+            {
+                ConnectSuccess = false;//if the try failed, you can check the exception here
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) //after the doInBackground, it checks if everything went fine
+        {
+            super.onPostExecute(result);
+
+            if (!ConnectSuccess)
+            {
+                finish();
+                Toast.makeText(getApplicationContext(), "Failed to connect", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                isBtConnected = true;
+                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

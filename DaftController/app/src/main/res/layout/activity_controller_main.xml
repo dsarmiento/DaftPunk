@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_controller_main"
@@ -109,6 +111,18 @@
     <ToggleButton
         android:layout_width="100dp"
         android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/allOn"
+        style="@style/AppTheme"
+        android:textOff="@string/all_on"
+        android:textOn="@string/all_on"
+        android:text="@string/all_on"
+        android:layout_below="@+id/whiteNoise"
+        android:layout_alignParentStart="true" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
         android:id="@+id/allOff"
         android:layout_alignBottom="@+id/allOn"
         android:layout_alignTop="@+id/allOn"
@@ -140,17 +154,5 @@
         android:layout_alignBaseline="@+id/sendMsg"
         android:layout_alignBottom="@+id/sendMsg"
         android:layout_alignParentEnd="true" />
-
-    <ToggleButton
-        android:layout_width="100dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="10dp"
-        android:id="@+id/allOn"
-        style="@style/AppTheme"
-        android:textOff="@string/all_on"
-        android:textOn="@string/all_on"
-        android:text="@string/all_on"
-        android:layout_below="@+id/whiteNoise"
-        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

@@ -2,19 +2,30 @@ package com.dsarmiento.daftcontroller;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import java.util.LinkedList;
 
+
+
 public class ControllerMain extends AppCompatActivity {
-    LinkedList<ToggleButton> toggleButtons;
+    private LinkedList<ToggleButton> toggleButtons;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.actionbar_menu, menu);
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controller_main);
+
         toggleButtons = new LinkedList<>();
 
         final ToggleButton roboCop = (ToggleButton) findViewById(R.id.roboCop);

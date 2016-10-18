@@ -10,4 +10,6 @@
     <string name="all_off">All Off</string>
     <string name="all_on">All On</string>
     <string name="pac_man">PacMan</string>
+
+    <string name="action_settings">Test setting</string>
 </resources>

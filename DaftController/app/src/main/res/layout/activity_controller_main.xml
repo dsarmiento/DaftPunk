@@ -25,18 +25,6 @@
     <ToggleButton
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:layout_below="@+id/roboCop"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp"
-        android:id="@+id/whiteNoise"
-        android:textOff="@string/white_noise"
-        android:textOn="@string/white_noise"
-        android:text="@string/white_noise"
-        style="@style/AppTheme" />
-
-    <ToggleButton
-        android:layout_width="100dp"
-        android:layout_height="60dp"
         android:id="@+id/heartBeat"
         android:textOff="@string/heart_beat"
         android:textOn="@string/heart_beat"
@@ -55,8 +43,8 @@
         android:layout_marginStart="10dp"
         android:id="@+id/blinkingEyes"
         android:textOff="@string/blinking_eyes"
-        android:textOn="@string/blinking_eyes" />
-
+        android:textOn="@string/blinking_eyes"
+        style="@style/AppTheme" />
 
     <ToggleButton
         android:text="@string/static_text"
@@ -67,17 +55,21 @@
         android:textOn="@string/static_text"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/blinkingEyes"
-        android:layout_marginStart="10dp" />
+        android:layout_marginStart="10dp"
+        style="@style/AppTheme" />
 
     <ToggleButton
-        android:text="@string/marquee"
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:id="@+id/marqueeText"
-        android:textOff="@string/marquee"
-        android:textOn="@string/marquee"
-        android:layout_alignTop="@+id/heartBlink"
-        android:layout_alignStart="@+id/staticText" />
+        android:layout_below="@+id/roboCop"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:id="@+id/whiteNoise"
+        android:textOff="@string/white_noise"
+        android:textOn="@string/white_noise"
+        android:text="@string/white_noise"
+        style="@style/AppTheme" />
+
 
     <ToggleButton
         android:layout_width="100dp"
@@ -89,4 +81,73 @@
         style="@style/AppTheme"
         android:layout_alignTop="@+id/whiteNoise"
         android:layout_alignStart="@+id/heartBeat" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/toggleButton3"
+        style="@style/AppTheme"
+        android:layout_alignTop="@+id/marqueeText"
+        android:layout_alignStart="@+id/blinkingEyes"
+        android:textOff="@string/pac_man"
+        android:textOn="@string/pac_man"
+        android:text="@string/pac_man" />
+
+    <ToggleButton
+        android:text="@string/marquee"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/marqueeText"
+        android:textOff="@string/marquee"
+        android:textOn="@string/marquee"
+        android:layout_alignTop="@+id/heartBlink"
+        android:layout_alignStart="@+id/staticText"
+        style="@style/AppTheme" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/allOn"
+        style="@style/AppTheme"
+        android:layout_below="@+id/whiteNoise"
+        android:layout_alignParentStart="true"
+        android:textOff="@string/all_on"
+        android:textOn="@string/all_on"
+        android:text="@string/all_on" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/allOff"
+        android:layout_alignBottom="@+id/allOn"
+        android:layout_alignTop="@+id/allOn"
+        android:layout_alignStart="@+id/heartBlink"
+        android:textOff="@string/all_off"
+        android:textOn="@string/all_off"
+        android:text="@string/all_off"
+        style="@style/AppTheme" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_marginBottom="45dp"
+        android:id="@+id/sendMsg"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:hint="Message"
+        android:singleLine="true"
+        android:layout_toStartOf="@+id/marqueeText" />
+
+    <Button
+        android:text="Send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sendButton"
+        android:layout_alignBaseline="@+id/sendMsg"
+        android:layout_alignBottom="@+id/sendMsg"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

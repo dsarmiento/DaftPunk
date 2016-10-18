@@ -101,6 +101,7 @@ public class ControllerMain extends AppCompatActivity {
         roboCop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(4);
                     turnOff(roboCop);
                 }
             }
@@ -109,6 +110,7 @@ public class ControllerMain extends AppCompatActivity {
         heartBeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(2);
                     turnOff(heartBeat);
                 }
             }
@@ -117,6 +119,7 @@ public class ControllerMain extends AppCompatActivity {
         heartBlink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(3);
                     turnOff(heartBlink);
                 }
             }
@@ -125,6 +128,7 @@ public class ControllerMain extends AppCompatActivity {
         blinkingEyes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(6);
                     turnOff(blinkingEyes);
                 }
             }
@@ -133,6 +137,7 @@ public class ControllerMain extends AppCompatActivity {
         whiteNoise.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(5);
                     turnOff(whiteNoise);
                 }
             }
@@ -165,6 +170,7 @@ public class ControllerMain extends AppCompatActivity {
         allOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(8);
                     turnOff(allOn);
                 }
             }
@@ -173,6 +179,7 @@ public class ControllerMain extends AppCompatActivity {
         allOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(9);
                     turnOff(allOff);
                 }
             }
@@ -223,6 +230,15 @@ public class ControllerMain extends AppCompatActivity {
 
         }
     };
+
+    private void sendCmd(int x) {
+        if(mBluetoothSocket != null) {
+            try {
+                //System.out.println("In sendCmd " + Integer.toString(x));
+                mBluetoothSocket.getOutputStream().write(Integer.toString(x).getBytes());
+            } catch (IOException e) {}
+        }
+    }
 
     private void testDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(ControllerMain.this);

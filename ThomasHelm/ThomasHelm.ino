@@ -12,6 +12,7 @@
  */
 
 #include "Const.h" 
+#include <SoftwareSerial.h>
 
 // Connected pins
 #define latchPin 8  //Pin connected to ST_CP of 74HC595
@@ -20,6 +21,8 @@
 
 int option = 3;
 boolean flag = true;
+
+SoftwareSerial bluetooth = SoftwareSerial(2,3);
 
 // First time setup
 void setup() 
@@ -30,6 +33,14 @@ void setup()
     pinMode(dataPin, OUTPUT);
     digitalWrite(latchPin, HIGH);
     Serial.begin(9600);
+    bluetooth.begin(115200);
+    bluetooth.print("$$$");
+    delay(100);
+    bluetooth.println("U,9600,N");
+    bluetooth.print("---");
+    bluetooth.end();
+    bluetooth.begin(9600);
+    bluetooth.print("---");
 }
 
 // For counter option
@@ -46,9 +57,9 @@ int msgLen = 0;
 void loop()
 {
   // Check serial for new request
-  if(Serial.available() > 0)
+  if(bluetooth.available() > 0)
   {
-    char in = Serial.read();
+    char in = bluetooth.read();
     option = (int)in - '0';
     Serial.println(option);
     if(option == 1)

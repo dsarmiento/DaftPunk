@@ -94,7 +94,15 @@ void loop()
   }
   else if(option == 7)
   {
-    text(txt)
+    text(txt);
+  }
+  else if(option == 8)
+  {
+    all(true);
+  }
+  else if(option == 9)
+  {
+    all(false);
   }
 }
 
@@ -403,6 +411,7 @@ void eyes()
 
 void text(char txt[6])
 {
+  uint8_t data[8][6];
   for(int i = 0; i < 8; i++)
   {
     data[i][0]  = 1 << i;
@@ -457,6 +466,23 @@ void text(char txt[6])
     else
     {
       data[i][5]  = 0x00;
+    }
+  }
+  sendScreen(data, 50);
+}
+
+void all(boolean x)
+{
+  uint8_t data[8][6];
+  for(int i = 0; i < 8; i++)
+  {
+    data[i][0] = 1 << i;
+    for(int j = 0; j < 6; j++)
+    {
+      if(x)
+        data[i][j] = 0xFF;
+      else
+        data[i][j] = 0x00;
     }
   }
   sendScreen(data, 50);

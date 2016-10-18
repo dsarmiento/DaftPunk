@@ -24,6 +24,9 @@ public class ControllerMain extends AppCompatActivity {
         final ToggleButton whiteNoise = (ToggleButton) findViewById(R.id.whiteNoise);
         final ToggleButton marqueeText = (ToggleButton) findViewById(R.id.marqueeText);
         final ToggleButton staticText = (ToggleButton) findViewById(R.id.staticText);
+        final ToggleButton pacMan = (ToggleButton) findViewById(R.id.pacMan);
+        final ToggleButton allOn = (ToggleButton) findViewById(R.id.allOn);
+        final ToggleButton allOff = (ToggleButton) findViewById(R.id.allOff);
 
         toggleButtons.add(roboCop);
         toggleButtons.add(heartBeat);
@@ -32,6 +35,9 @@ public class ControllerMain extends AppCompatActivity {
         toggleButtons.add(whiteNoise);
         toggleButtons.add(marqueeText);
         toggleButtons.add(staticText);
+        toggleButtons.add(pacMan);
+        toggleButtons.add(allOn);
+        toggleButtons.add(allOff);
 
         roboCop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -85,6 +91,30 @@ public class ControllerMain extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     turnOff(staticText);
+                }
+            }
+        });
+
+        pacMan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    turnOff(pacMan);
+                }
+            }
+        });
+
+        allOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    turnOff(allOn);
+                }
+            }
+        });
+
+        allOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    turnOff(allOff);
                 }
             }
         });

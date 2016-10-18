@@ -8,6 +8,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     tools:context="com.dsarmiento.daftcontroller.ControllerMain">
 
     <ToggleButton
@@ -85,7 +87,7 @@
     <ToggleButton
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:id="@+id/toggleButton3"
+        android:id="@+id/pacMan"
         style="@style/AppTheme"
         android:layout_alignTop="@+id/marqueeText"
         android:layout_alignStart="@+id/blinkingEyes"
@@ -107,18 +109,6 @@
     <ToggleButton
         android:layout_width="100dp"
         android:layout_height="60dp"
-        android:layout_marginTop="10dp"
-        android:id="@+id/allOn"
-        style="@style/AppTheme"
-        android:layout_below="@+id/whiteNoise"
-        android:layout_alignParentStart="true"
-        android:textOff="@string/all_on"
-        android:textOn="@string/all_on"
-        android:text="@string/all_on" />
-
-    <ToggleButton
-        android:layout_width="100dp"
-        android:layout_height="60dp"
         android:id="@+id/allOff"
         android:layout_alignBottom="@+id/allOn"
         android:layout_alignTop="@+id/allOn"
@@ -126,7 +116,8 @@
         android:textOff="@string/all_off"
         android:textOn="@string/all_off"
         android:text="@string/all_off"
-        style="@style/AppTheme" />
+        style="@style/AppTheme"
+        android:checked="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -149,5 +140,17 @@
         android:layout_alignBaseline="@+id/sendMsg"
         android:layout_alignBottom="@+id/sendMsg"
         android:layout_alignParentEnd="true" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/allOn"
+        style="@style/AppTheme"
+        android:textOff="@string/all_on"
+        android:textOn="@string/all_on"
+        android:text="@string/all_on"
+        android:layout_below="@+id/whiteNoise"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

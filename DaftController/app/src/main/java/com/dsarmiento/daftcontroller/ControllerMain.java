@@ -76,16 +76,17 @@ public class ControllerMain extends AppCompatActivity {
 
         toggleButtons = new LinkedList<>();
 
-        final ToggleButton roboCop = (ToggleButton) findViewById(R.id.roboCop);
-        final ToggleButton heartBeat = (ToggleButton) findViewById(R.id.heartBeat);
-        final ToggleButton heartBlink = (ToggleButton) findViewById(R.id.heartBlink);
-        final ToggleButton blinkingEyes = (ToggleButton) findViewById(R.id.blinkingEyes);
-        final ToggleButton whiteNoise = (ToggleButton) findViewById(R.id.whiteNoise);
-        final ToggleButton marqueeText = (ToggleButton) findViewById(R.id.marqueeText);
-        final ToggleButton staticText = (ToggleButton) findViewById(R.id.staticText);
-        final ToggleButton pacMan = (ToggleButton) findViewById(R.id.pacMan);
-        final ToggleButton allOn = (ToggleButton) findViewById(R.id.allOn);
-        final ToggleButton allOff = (ToggleButton) findViewById(R.id.allOff);
+        final ToggleButton roboCop          = (ToggleButton) findViewById(R.id.roboCop);
+        final ToggleButton heartBeat        = (ToggleButton) findViewById(R.id.heartBeat);
+        final ToggleButton heartBlink       = (ToggleButton) findViewById(R.id.heartBlink);
+        final ToggleButton blinkingEyes     = (ToggleButton) findViewById(R.id.blinkingEyes);
+        final ToggleButton whiteNoise       = (ToggleButton) findViewById(R.id.whiteNoise);
+        final ToggleButton marqueeText      = (ToggleButton) findViewById(R.id.marqueeText);
+        final ToggleButton staticText       = (ToggleButton) findViewById(R.id.staticText);
+        final ToggleButton pacMan           = (ToggleButton) findViewById(R.id.pacMan);
+        final ToggleButton allOn            = (ToggleButton) findViewById(R.id.allOn);
+        final ToggleButton allOff           = (ToggleButton) findViewById(R.id.allOff);
+        final ToggleButton cyclops          = (ToggleButton) findViewById(R.id.cyclops);
 
         toggleButtons.add(roboCop);
         toggleButtons.add(heartBeat);
@@ -97,6 +98,7 @@ public class ControllerMain extends AppCompatActivity {
         toggleButtons.add(pacMan);
         toggleButtons.add(allOn);
         toggleButtons.add(allOff);
+        toggleButtons.add(cyclops);
 
         roboCop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -162,6 +164,7 @@ public class ControllerMain extends AppCompatActivity {
         pacMan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(10);
                     turnOff(pacMan);
                 }
             }
@@ -181,6 +184,15 @@ public class ControllerMain extends AppCompatActivity {
                 if (isChecked) {
                     sendCmd(9);
                     turnOff(allOff);
+                }
+            }
+        });
+
+        cyclops.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sendCmd(11);
+                    turnOff(cyclops);
                 }
             }
         });
@@ -211,7 +223,6 @@ public class ControllerMain extends AppCompatActivity {
             lv.setAdapter(adapter);
             lv.setOnItemClickListener(myListClickListener);
             ad = alertDialog.show();
-
         }
     }
 

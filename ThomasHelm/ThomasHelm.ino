@@ -1,14 +1,18 @@
 /* Daniel Sarmiento
  * Code for my Thomas Daft Punk Visor
  * Current animations:
- * 0 Count up timer
- * 1 Marquee
- * 2 Heart beat
- * 3 Heart blink
- * 4 RoboCop
- * 5 White noise
- * 6 Blinking eyes
- * 7 Static text
+ * 0  Count up timer
+ * 1  Marquee
+ * 2  Heart beat
+ * 3  Heart blink
+ * 4  RoboCop
+ * 5  White noise
+ * 6  Blinking eyes
+ * 7  Static text
+ * 8  All on
+ * 9  All off
+ * 10 Pacman
+ * 11 Cyclops
  */
 
 #include "Const.h" 
@@ -19,7 +23,7 @@
 #define clockPin 12 //Pin connected to SH_CP of 74HC595
 #define dataPin 11  //Pin connected to DS of 74HC595
 
-int option = 3;
+int option = 12;
 boolean flag = true;
 
 SoftwareSerial bluetooth = SoftwareSerial(2,3);
@@ -57,10 +61,9 @@ int msgLen = 0;
 void loop()
 {
   // Check serial for new request
-  if(bluetooth.available() > 0)
+  if(Serial.available() > 0)
   {
-    char in = bluetooth.read();
-    option = (int)in - '0';
+    option = Serial.parseInt();
     Serial.println(option);
     if(option == 1)
     {
@@ -73,7 +76,6 @@ void loop()
     }
     
   }
-  
   if(option == 0)
   {
     countUp(cnt);
@@ -115,6 +117,37 @@ void loop()
   {
     all(false);
   }
+  else if(option == 10)
+  {
+    pacman();
+  }
+  else if(option == 11)
+  {
+    cyclops();
+  }
+  else if(option == 12)
+  {
+    daftPunk();
+  }
+}
+
+void daftPunk()
+{
+  long timer = millis();
+  while(millis() < timer + 750)
+    text(" DAFT ");
+    
+  timer = millis();
+  while(millis() < timer + 250)
+    all(false);
+    
+  timer = millis();
+  while(millis() < timer + 750)
+    text(" PUNK ");
+    
+  timer = millis();
+  while(millis() < timer + 250)
+    all(false);
 }
 
 void countUp(int cnt)
@@ -347,26 +380,16 @@ void heartBlink()
     for(int i = 0; i < 8; i++)
     {
       data[i][0] = 1 << i;
-      if(i != 7)
-      {
-        data[i][1]  = heartFull[i][0];
-        data[i][2]  = heartFull[i][1];
-        data[i][2] |= heartFull[i][0] >> 7;
-        data[i][3]  = heartFull[i][0] << 1;
-        data[i][3] |= heartFull[i][1] >> 7;
-        data[i][4]  = heartFull[i][1] << 1;
-        data[i][4] |= heartFull[i][0] >> 6;
-        data[i][5]  = heartFull[i][0] << 2;
-        data[i][5] |= heartFull[i][1] >> 6;
-      }
-      else
-      {
-        data[i][1] = 0x00;
-        data[i][2] = 0x00;
-        data[i][3] = 0x00;
-        data[i][4] = 0x00;
-        data[i][5] = 0x00;
-      }
+
+      data[i][1]  = heartFull[i][0];
+      data[i][2]  = heartFull[i][1];
+      data[i][2] |= heartFull[i][0] >> 7;
+      data[i][3]  = heartFull[i][0] << 1;
+      data[i][3] |= heartFull[i][1] >> 7;
+      data[i][4]  = heartFull[i][1] << 1;
+      data[i][4] |= heartFull[i][0] >> 6;
+      data[i][5]  = heartFull[i][0] << 2;
+      data[i][5] |= heartFull[i][1] >> 6;
     }
   }
   sendScreen(data, 50);
@@ -394,11 +417,11 @@ void eyes()
     for(int i = 0; i < 8; i++)
     {
       data[i][0] = 1 << i;
-      for(int j = 1; j < 6; j++)
-      {
-        
-        data[i][j] = blinking[k][i][j-1];
-      }
+      data[i][1] = 0x00;
+      data[i][2] = blinking[k][i];
+      data[i][3] = 0x00;
+      data[i][4] = blinking[k][i];
+      data[i][5] = 0x00;
     }
     if(k == 0)
       sendScreen(data, random(5) * 1000);
@@ -410,11 +433,11 @@ void eyes()
     for(int i = 0; i < 8; i++)
     {
       data[i][0] = 1 << i;
-      for(int j = 1; j < 6; j++)
-      {
-        
-        data[i][j] = blinking[k][i][j-1];
-      }
+      data[i][1] = 0x00;
+      data[i][2] = blinking[k][i];
+      data[i][3] = 0x00;
+      data[i][4] = blinking[k][i];
+      data[i][5] = 0x00;
     }
     sendScreen(data, 100);
   }
@@ -454,8 +477,8 @@ void text(char txt[6])
     }
     if(msg[3] != ' ')
     {
-      data[i][3] |= alphabet[msg[3] - 'A'][i] >> 2;
-      data[i][4]  = alphabet[msg[3] - 'A'][i] << 6;
+      data[i][3] |= alphabet[txt[3] - 'A'][i] >> 2;
+      data[i][4]  = alphabet[txt[3] - 'A'][i] << 6;
     }
     else
     {
@@ -491,6 +514,103 @@ void all(boolean x)
     for(int j = 0; j < 6; j++)
     {
       if(x)
+        data[i][j] = 0xFF;
+      else
+        data[i][j] = 0x00;
+    }
+  }
+  sendScreen(data, 50);
+}
+
+void pacman()
+{
+  uint8_t data[8][6];
+  uint8_t temp;
+  for(int i = 0; i < 48; i++)
+  {
+    int k = 0;
+    switch(i % 6){
+      case 0:
+        k = 0;
+        break;
+      case 1:
+      case 5:
+        k = 1;
+        break;
+      case 2:
+      case 4:
+        k = 2;
+        break;
+      case 3:
+        k = 3;
+        break;
+    }
+    for(int j = 0; j < 8; j++)
+    {
+      data[j][0] = 1 << j;
+
+      
+
+      if(i < 8)
+        data[j][1] = pacMan[k][j] << 7 - (i%8);
+      else if(i < 16)
+        data[j][1] = pacMan[k][j] >> i%8;
+      else
+        data[j][1] = 0x00;
+
+      if(i >= 8 && i < 16)
+        data[j][2] = pacMan[k][j] << 7 - (i%8);
+      else if(i >= 16 && i < 24)
+        data[j][2] = pacMan[k][j] >> i%8;
+      else
+        data[j][2] = 0x00;
+
+      if(i >=16 && i < 24)
+        data[j][3] = pacMan[k][j] << 7 - (i%8);
+      else if(i >= 24 && i < 32)
+        data[j][3] = pacMan[k][j] >> i%8;
+      else
+        data[j][3] = 0x00;
+
+      if(i >= 24 && i < 32)
+        data[j][4] = pacMan[k][j] << 7 - (i%8);
+      else if(i >= 32 && i < 40)
+        data[j][4] = pacMan[k][j] >> i%8;
+      else
+        data[j][4] = 0x00;
+
+      if(i >= 32 && i < 40)
+        data[j][5] = pacMan[k][j] << 7 - (i%8);
+      else if(i >= 40)
+        data[j][5] = pacMan[k][j] >> i%8;
+      else
+        data[j][5] = 0x00;
+
+      if(j == 3 || j == 4)
+      {
+        for(int dot = 0; dot < 5; dot++)
+        {
+          if(dot >= (i / 8))
+          {
+            data[j][dot+1] |= 0x18;
+          }
+        }
+      }
+
+    }
+    sendScreen(data, 100);
+  }
+}
+
+void cyclops()
+{
+  uint8_t data[8][6];
+  for(int i = 0; i < 8; i++)
+  {
+    data[i][0] = 1 << i;
+    for(int j = 1; j < 6; j++)
+    {
+      if(i == 3 | i == 4)
         data[i][j] = 0xFF;
       else
         data[i][j] = 0x00;

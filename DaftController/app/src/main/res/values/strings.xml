@@ -10,6 +10,7 @@
     <string name="all_off">All Off</string>
     <string name="all_on">All On</string>
     <string name="pac_man">PacMan</string>
+    <string name="cyclops">Cyclops</string>
 
     <string name="action_connect">Connect</string>
 </resources>

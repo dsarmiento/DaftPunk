@@ -122,6 +122,17 @@
                 android:textOff="@string/blinking_eyes"
                 android:textOn="@string/blinking_eyes"
                 style="@style/AppTheme" />
+
+            <ToggleButton
+                android:text="@string/static_text"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="10dp"
+                android:id="@+id/staticText"
+                android:textOff="@string/static_text"
+                android:textOn="@string/static_text"
+                style="@style/AppTheme" />
+
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
@@ -131,12 +142,19 @@
             android:id="@+id/col3">
 
             <ToggleButton
-                android:text="@string/static_text"
+                android:text="@string/cyclops"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:id="@+id/staticText"
-                android:textOff="@string/static_text"
-                android:textOn="@string/static_text"
+                android:id="@+id/cyclops"
+                android:textOff="@string/cyclops"
+                android:textOn="@string/cyclops"
+                style="@style/AppTheme" />
+
+            <ToggleButton
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="10dp"
+                android:id="@+id/toggleButton3"
                 style="@style/AppTheme" />
 
             <ToggleButton

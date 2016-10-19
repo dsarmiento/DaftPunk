@@ -23,7 +23,7 @@
 #define clockPin 12 //Pin connected to SH_CP of 74HC595
 #define dataPin 11  //Pin connected to DS of 74HC595
 
-int option = 12;
+int option = 9;
 boolean flag = true;
 
 SoftwareSerial bluetooth = SoftwareSerial(2,3);
@@ -61,9 +61,9 @@ int msgLen = 0;
 void loop()
 {
   // Check serial for new request
-  if(Serial.available() > 0)
+  if(bluetooth.available() > 0)
   {
-    option = Serial.parseInt();
+    option = bluetooth.parseInt();
     Serial.println(option);
     if(option == 1)
     {

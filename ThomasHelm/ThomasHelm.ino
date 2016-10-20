@@ -1,5 +1,7 @@
 /* Daniel Sarmiento
  * Code for my Thomas Daft Punk Visor
+ * Pin 2 - TX on Bluetooth
+ * Pin 3 - RX on Bluetooth
  * Current animations:
  * 0  Count up timer
  * 1  Marquee
@@ -152,9 +154,9 @@ void daftPunk()
 
 void countUp(int cnt)
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
-    for(int j = 0; j < 6; j++)
+    for(int j = 0; j < 5; j++)
       data[i][j] = 0x00;
 
     // Wrap over counter
@@ -172,31 +174,29 @@ void countUp(int cnt)
     for(int i = 0; i < 8; i++)
     {
       byte temp = 0;
-      // Compute the row data
-      data[i][0] = 1 << i;
       
       temp = numbers[digits[0]][i] >> 1;
-      data[i][1] = temp;
+      data[i][0] = temp;
       
       temp = 0;
       temp = numbers[digits[0]][i] << 7;
       temp |= numbers[digits[1]][i] >> 2;
-      data[i][2] = temp;
+      data[i][1] = temp;
       
       temp = 0;
       temp = numbers[digits[1]][i] << 6;
       temp |= colon[i];
       temp |= numbers[digits[2]][i] >> 6;
-      data[i][3] = temp;
+      data[i][2] = temp;
       
       temp = 0;
       temp = numbers[digits[2]][i] << 2;
       temp |= numbers[digits[3]][i] >> 7;
-      data[i][4] = temp;
+      data[i][3] = temp;
       
       temp = 0;
       temp = numbers[digits[3]][i] << 1;
-      data[i][5] = temp;
+      data[i][4] = temp;
       
       
     }
@@ -206,12 +206,12 @@ void countUp(int cnt)
 
 void marquee(char msg[])
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   if(flag)
   {
     flag = false;
     for(int i = 0; i < 8; i++)
-      for(int j = 0; j < 6; j++)
+      for(int j = 0; j < 5; j++)
         data[i][j] = 0x00;
   }
       
@@ -228,28 +228,27 @@ void marquee(char msg[])
         }
       }
       
-      temp[0] = data[i][1];
-      temp[1] = data[i][2];
-      temp[2] = data[i][3];
-      temp[3] = data[i][4];
-      temp[4] = data[i][5];
+      temp[0] = data[i][0];
+      temp[1] = data[i][1];
+      temp[2] = data[i][2];
+      temp[3] = data[i][3];
+      temp[4] = data[i][4];
       
+      data[i][0] <<= 1;
       data[i][1] <<= 1;
       data[i][2] <<= 1;
       data[i][3] <<= 1;
       data[i][4] <<= 1;
-      data[i][5] <<= 1;
       
-      data[i][5] |= ch;
+      data[i][4] |= ch;
       temp[4] >>= 7;
-      data[i][4] |= temp[4];
+      data[i][3] |= temp[4];
       temp[3] >>= 7;
-      data[i][3] |= temp[3];
+      data[i][2] |= temp[3];
       temp[2] >>= 7;
-      data[i][2] |= temp[2];
+      data[i][1] |= temp[2];
       temp[1] >>= 7;
-      data[i][1] |= temp[1];
-      data[i][0] = 1 << i;
+      data[i][0] |= temp[1];
       
     } 
     sendScreen(data, 150);
@@ -258,7 +257,7 @@ void marquee(char msg[])
 
 void roboCop(int timerDelay)
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   uint8_t robo[5] = {0xF0, 0x00, 0x00, 0x00, 0x00};
   uint8_t temp[5];
 
@@ -283,12 +282,11 @@ void roboCop(int timerDelay)
     
     for(int j = 0; j < 8; j++)
     {
-      data[j][0] = 1 << j;
-      data[j][1] = robo[0];
-      data[j][2] = robo[1];
-      data[j][3] = robo[2];
-      data[j][4] = robo[3];
-      data[j][5] = robo[4];
+      data[j][0] = robo[0];
+      data[j][1] = robo[1];
+      data[j][2] = robo[2];
+      data[j][3] = robo[3];
+      data[j][4] = robo[4];
     }
     sendScreen(data, timerDelay);
   }
@@ -314,12 +312,11 @@ void roboCop(int timerDelay)
     
     for(int j = 0; j < 8; j++)
     {
-      data[j][0] = 1 << j;
-      data[j][1] = robo[0];
-      data[j][2] = robo[1];
-      data[j][3] = robo[2];
-      data[j][4] = robo[3];
-      data[j][5] = robo[4];
+      data[j][0] = robo[0];
+      data[j][1] = robo[1];
+      data[j][2] = robo[2];
+      data[j][3] = robo[3];
+      data[j][4] = robo[4];
     }
     sendScreen(data, timerDelay);
   }
@@ -327,19 +324,18 @@ void roboCop(int timerDelay)
 
 void heartBeat()
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   uint8_t mask[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
   for(int j = 0; j < 40; j++)
   {
     mask[j / 8] |= 1 << 7 - (j % 8);
     for(int i = 0; i < 8; i++)
     {
-      data[i][0] = 1 << i;
-      data[i][1] = heartbeat[i][0] & mask[0];
-      data[i][2] = heartbeat[i][1] & mask[1];
-      data[i][3] = heartbeat[i][2] & mask[2];
-      data[i][4] = heartbeat[i][3] & mask[3];
-      data[i][5] = heartbeat[i][4] & mask[4];
+      data[i][0] = heartbeat[i][0] & mask[0];
+      data[i][1] = heartbeat[i][1] & mask[1];
+      data[i][2] = heartbeat[i][2] & mask[2];
+      data[i][3] = heartbeat[i][3] & mask[3];
+      data[i][4] = heartbeat[i][4] & mask[4];
     }
     sendScreen(data, 25);
   }
@@ -347,49 +343,36 @@ void heartBeat()
 
 void heartBlink()
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   if((millis()/500) % 2 == 0)
   {
     for(int i = 0; i < 8; i++)
     {
-      data[i][0] = 1 << i;
-      if(i != 7)
-      {
-        data[i][1]  = heartEmpty[i][0];
-        data[i][2]  = heartEmpty[i][1];
-        data[i][2] |= heartEmpty[i][0] >> 7;
-        data[i][3]  = heartEmpty[i][0] << 1;
-        data[i][3] |= heartEmpty[i][1] >> 7;
-        data[i][4]  = heartEmpty[i][1] << 1;
-        data[i][4] |= heartEmpty[i][0] >> 6;
-        data[i][5]  = heartEmpty[i][0] << 2;
-        data[i][5] |= heartEmpty[i][1] >> 6;
-      }
-      else
-      {
-        data[i][1] = 0x00;
-        data[i][2] = 0x00;
-        data[i][3] = 0x00;
-        data[i][4] = 0x00;
-        data[i][5] = 0x00;
-      }
+      data[i][0]  = heartEmpty[i][0];
+      data[i][1]  = heartEmpty[i][1];
+      data[i][1] |= heartEmpty[i][0] >> 7;
+      data[i][2]  = heartEmpty[i][0] << 1;
+      data[i][2] |= heartEmpty[i][1] >> 7;
+      data[i][3]  = heartEmpty[i][1] << 1;
+      data[i][3] |= heartEmpty[i][0] >> 6;
+      data[i][4]  = heartEmpty[i][0] << 2;
+      data[i][4] |= heartEmpty[i][1] >> 6;
     }
   }
   else
   {
     for(int i = 0; i < 8; i++)
     {
-      data[i][0] = 1 << i;
 
-      data[i][1]  = heartFull[i][0];
-      data[i][2]  = heartFull[i][1];
-      data[i][2] |= heartFull[i][0] >> 7;
-      data[i][3]  = heartFull[i][0] << 1;
-      data[i][3] |= heartFull[i][1] >> 7;
-      data[i][4]  = heartFull[i][1] << 1;
-      data[i][4] |= heartFull[i][0] >> 6;
-      data[i][5]  = heartFull[i][0] << 2;
-      data[i][5] |= heartFull[i][1] >> 6;
+      data[i][0]  = heartFull[i][0];
+      data[i][1]  = heartFull[i][1];
+      data[i][1] |= heartFull[i][0] >> 7;
+      data[i][2]  = heartFull[i][0] << 1;
+      data[i][2] |= heartFull[i][1] >> 7;
+      data[i][3]  = heartFull[i][1] << 1;
+      data[i][3] |= heartFull[i][0] >> 6;
+      data[i][4]  = heartFull[i][0] << 2;
+      data[i][4] |= heartFull[i][1] >> 6;
     }
   }
   sendScreen(data, 50);
@@ -397,11 +380,10 @@ void heartBlink()
 
 void noise()
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
-    data[i][0] = 1 << i;
-    for(int j = 1; j < 6; j++)
+    for(int j = 0; j < 5; j++)
     {
       data[i][j] = random(256);
     }
@@ -411,17 +393,16 @@ void noise()
 
 void eyes()
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   for(int k = 0; k < 4; k++)
   {
     for(int i = 0; i < 8; i++)
     {
-      data[i][0] = 1 << i;
-      data[i][1] = 0x00;
-      data[i][2] = blinking[k][i];
-      data[i][3] = 0x00;
-      data[i][4] = blinking[k][i];
-      data[i][5] = 0x00;
+      data[i][0] = 0x00;
+      data[i][1] = blinking[k][i];
+      data[i][2] = 0x00;
+      data[i][3] = blinking[k][i];
+      data[i][4] = 0x00;
     }
     if(k == 0)
       sendScreen(data, random(5) * 1000);
@@ -432,12 +413,11 @@ void eyes()
   {
     for(int i = 0; i < 8; i++)
     {
-      data[i][0] = 1 << i;
-      data[i][1] = 0x00;
-      data[i][2] = blinking[k][i];
-      data[i][3] = 0x00;
-      data[i][4] = blinking[k][i];
-      data[i][5] = 0x00;
+      data[i][0] = 0x00;
+      data[i][1] = blinking[k][i];
+      data[i][2] = 0x00;
+      data[i][3] = blinking[k][i];
+      data[i][4] = 0x00;
     }
     sendScreen(data, 100);
   }
@@ -445,61 +425,60 @@ void eyes()
 
 void text(char txt[6])
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
-    data[i][0]  = 1 << i;
     if(msg[0] != ' ')
     {
-      data[i][1]  = alphabet[txt[0] - 'A'][i];
+      data[i][0]  = alphabet[txt[0] - 'A'][i];
+    }
+    else
+    {
+      data[i][0]  = 0x00;
+    }
+    if(msg[1] != ' ')
+    {
+      data[i][1]  = alphabet[txt[1] - 'A'][i] << 2;
     }
     else
     {
       data[i][1]  = 0x00;
     }
-    if(msg[1] != ' ')
-    {
-      data[i][2]  = alphabet[txt[1] - 'A'][i] << 2;
-    }
-    else
-    {
-      data[i][2]  = 0x00;
-    }
     if(msg[2] != ' ')
     {
-      data[i][2] |= alphabet[txt[2] - 'A'][i] >> 4;
-      data[i][3]  = alphabet[txt[2] - 'A'][i] << 4;
+      data[i][1] |= alphabet[txt[2] - 'A'][i] >> 4;
+      data[i][2]  = alphabet[txt[2] - 'A'][i] << 4;
     }
     else
     {
-      data[i][2] &= ~0x03;
-      data[i][3]  = 0x00; 
+      data[i][1] &= ~0x03;
+      data[i][2]  = 0x00; 
     }
     if(msg[3] != ' ')
     {
-      data[i][3] |= alphabet[txt[3] - 'A'][i] >> 2;
-      data[i][4]  = alphabet[txt[3] - 'A'][i] << 6;
+      data[i][2] |= alphabet[txt[3] - 'A'][i] >> 2;
+      data[i][3]  = alphabet[txt[3] - 'A'][i] << 6;
     }
     else
     {
-      data[i][3] &= ~0x0F;
-      data[i][4]  = 0x00;
+      data[i][2] &= ~0x0F;
+      data[i][3]  = 0x00;
     }
     if(msg[4] != ' ')
     {
-      data[i][4] |= alphabet[txt[4] - 'A'][i];
+      data[i][3] |= alphabet[txt[4] - 'A'][i];
     }
     else
     {
-      data[i][4] &= ~0x3F;
+      data[i][3] &= ~0x3F;
     }
     if(msg[5] != ' ')
     {
-      data[i][5]  = alphabet[txt[5] - 'A'][i] << 2;
+      data[i][4]  = alphabet[txt[5] - 'A'][i] << 2;
     }
     else
     {
-      data[i][5]  = 0x00;
+      data[i][4]  = 0x00;
     }
   }
   sendScreen(data, 50);
@@ -507,11 +486,10 @@ void text(char txt[6])
 
 void all(boolean x)
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
-    data[i][0] = 1 << i;
-    for(int j = 0; j < 6; j++)
+    for(int j = 0; j < 5; j++)
     {
       if(x)
         data[i][j] = 0xFF;
@@ -524,7 +502,7 @@ void all(boolean x)
 
 void pacman()
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   uint8_t temp;
   for(int i = 0; i < 48; i++)
   {
@@ -547,44 +525,40 @@ void pacman()
     }
     for(int j = 0; j < 8; j++)
     {
-      data[j][0] = 1 << j;
-
-      
-
       if(i < 8)
-        data[j][1] = pacMan[k][j] << 7 - (i%8);
+        data[j][0] = pacMan[k][j] << 7 - (i%8);
       else if(i < 16)
+        data[j][0] = pacMan[k][j] >> i%8;
+      else
+        data[j][0] = 0x00;
+
+      if(i >= 8 && i < 16)
+        data[j][1] = pacMan[k][j] << 7 - (i%8);
+      else if(i >= 16 && i < 24)
         data[j][1] = pacMan[k][j] >> i%8;
       else
         data[j][1] = 0x00;
 
-      if(i >= 8 && i < 16)
+      if(i >=16 && i < 24)
         data[j][2] = pacMan[k][j] << 7 - (i%8);
-      else if(i >= 16 && i < 24)
+      else if(i >= 24 && i < 32)
         data[j][2] = pacMan[k][j] >> i%8;
       else
         data[j][2] = 0x00;
 
-      if(i >=16 && i < 24)
+      if(i >= 24 && i < 32)
         data[j][3] = pacMan[k][j] << 7 - (i%8);
-      else if(i >= 24 && i < 32)
+      else if(i >= 32 && i < 40)
         data[j][3] = pacMan[k][j] >> i%8;
       else
         data[j][3] = 0x00;
 
-      if(i >= 24 && i < 32)
+      if(i >= 32 && i < 40)
         data[j][4] = pacMan[k][j] << 7 - (i%8);
-      else if(i >= 32 && i < 40)
+      else if(i >= 40)
         data[j][4] = pacMan[k][j] >> i%8;
       else
         data[j][4] = 0x00;
-
-      if(i >= 32 && i < 40)
-        data[j][5] = pacMan[k][j] << 7 - (i%8);
-      else if(i >= 40)
-        data[j][5] = pacMan[k][j] >> i%8;
-      else
-        data[j][5] = 0x00;
 
       if(j == 3 || j == 4)
       {
@@ -592,7 +566,7 @@ void pacman()
         {
           if(dot >= (i / 8))
           {
-            data[j][dot+1] |= 0x18;
+            data[j][dot] |= 0x18;
           }
         }
       }
@@ -604,11 +578,10 @@ void pacman()
 
 void cyclops()
 {
-  uint8_t data[8][6];
+  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
-    data[i][0] = 1 << i;
-    for(int j = 1; j < 6; j++)
+    for(int j = 0; j < 5; j++)
     {
       if(i == 3 | i == 4)
         data[i][j] = 0xFF;
@@ -619,7 +592,7 @@ void cyclops()
   sendScreen(data, 50);
 }
 
-void sendScreen(uint8_t data[8][6], int timerDelay)
+void sendScreen(uint8_t data[8][5], int timerDelay)
 {
     long timer = millis();
     while(millis() < timer + timerDelay)
@@ -627,12 +600,12 @@ void sendScreen(uint8_t data[8][6], int timerDelay)
         for(int i = 0; i < 8; i++)
         {
             digitalWrite(latchPin, LOW);
-            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][5]);
-            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][4]); 
+            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][4]);
             shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][3]); 
             shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][2]); 
             shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][1]); 
-            shiftOut(dataPin, clockPin, LSBFIRST, data[i][0]);  
+            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][0]); 
+            shiftOut(dataPin, clockPin, LSBFIRST, 1 << i);  
             digitalWrite(latchPin, HIGH);
         }
     }  

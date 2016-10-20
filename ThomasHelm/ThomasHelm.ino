@@ -33,20 +33,20 @@ SoftwareSerial bluetooth = SoftwareSerial(2,3);
 // First time setup
 void setup() 
 {
-    // Shift register
-    pinMode(latchPin, OUTPUT);
-    pinMode(clockPin, OUTPUT);
-    pinMode(dataPin, OUTPUT);
-    digitalWrite(latchPin, HIGH);
-    Serial.begin(9600);
-    bluetooth.begin(115200);
-    bluetooth.print("$$$");
-    delay(100);
-    bluetooth.println("U,9600,N");
-    bluetooth.print("---");
-    bluetooth.end();
-    bluetooth.begin(9600);
-    bluetooth.print("---");
+  // Shift register
+  pinMode(latchPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
+  digitalWrite(latchPin, HIGH);
+  Serial.begin(9600);
+  bluetooth.begin(115200);
+  bluetooth.print("$$$");
+  delay(100);
+  bluetooth.println("U,9600,N");
+  bluetooth.print("---");
+  bluetooth.end();
+  bluetooth.begin(9600);
+  bluetooth.print("---");
 }
 
 // For counter option
@@ -151,48 +151,48 @@ void countDown(int cnt)
     for(int j = 0; j < 5; j++)
       data[i][j] = 0x00;
 
-    // Wrap over counter
-    if(cnt > 9999)
-        cnt = 0;  
+  // Wrap over counter
+  if(cnt > 9999)
+    cnt = 0;  
 
-    // Grab the digits
-    int digits[4]; // Digits in time 01:23
-    digits[0] = cnt/1000;
-    digits[1] = (cnt/100)%10;
-    digits[2] = (cnt/10)%10;
-    digits[3] = cnt%10;
+  // Grab the digits
+  int digits[4]; // Digits in time 01:23
+  digits[0] = cnt/1000;
+  digits[1] = (cnt/100)%10;
+  digits[2] = (cnt/10)%10;
+  digits[3] = cnt%10;
 
-    // Go through the rows
-    for(int i = 0; i < 8; i++)
-    {
-      byte temp = 0;
+  // Go through the rows
+  for(int i = 0; i < 8; i++)
+  {
+  byte temp = 0;
       
-      temp = numbers[digits[0]][i] >> 1;
-      data[i][0] = temp;
+  temp = numbers[digits[0]][i] >> 1;
+  data[i][0] = temp;
       
-      temp = 0;
-      temp = numbers[digits[0]][i] << 7;
-      temp |= numbers[digits[1]][i] >> 2;
-      data[i][1] = temp;
+  temp = 0;
+  temp = numbers[digits[0]][i] << 7;
+  temp |= numbers[digits[1]][i] >> 2;
+  data[i][1] = temp;
       
-      temp = 0;
-      temp = numbers[digits[1]][i] << 6;
-      temp |= colon[i];
-      temp |= numbers[digits[2]][i] >> 6;
-      data[i][2] = temp;
+  temp = 0;
+  temp = numbers[digits[1]][i] << 6;
+  temp |= colon[i];
+  temp |= numbers[digits[2]][i] >> 6;
+  data[i][2] = temp;
       
-      temp = 0;
-      temp = numbers[digits[2]][i] << 2;
-      temp |= numbers[digits[3]][i] >> 7;
-      data[i][3] = temp;
+  temp = 0;
+  temp = numbers[digits[2]][i] << 2;
+  temp |= numbers[digits[3]][i] >> 7;
+  data[i][3] = temp;
       
-      temp = 0;
-      temp = numbers[digits[3]][i] << 1;
-      data[i][4] = temp;
+  temp = 0;
+  temp = numbers[digits[3]][i] << 1;
+  data[i][4] = temp;
       
       
-    }
-    sendScreen(data, 50);
+  }
+  sendScreen(data, 50);
 }
 
 
@@ -207,44 +207,44 @@ void marquee(char msg[])
         data[i][j] = 0x00;
   }
       
-    for(int i = 0; i < 8; i++){
-      ch = 0;
-      if(steps % 6 != 5){  
-        int pos = 4 - (steps % 6);
-        if(msg[(steps/6)%msgLen] != ' '){
-          ch = alphabet[msg[(steps/6)%msgLen] - 'A'][i];
-          ch >>= pos;
-          ch &= 0x01;
-        }else{
-          ch = 0;
-        }
+  for(int i = 0; i < 8; i++){
+    ch = 0;
+    if(steps % 6 != 5){  
+      int pos = 4 - (steps % 6);
+      if(msg[(steps/6)%msgLen] != ' '){
+        ch = alphabet[msg[(steps/6)%msgLen] - 'A'][i];
+        ch >>= pos;
+        ch &= 0x01;
+      }else{
+        ch = 0;
       }
+    }
       
-      temp[0] = data[i][0];
-      temp[1] = data[i][1];
-      temp[2] = data[i][2];
-      temp[3] = data[i][3];
-      temp[4] = data[i][4];
+    temp[0] = data[i][0];
+    temp[1] = data[i][1];
+    temp[2] = data[i][2];
+    temp[3] = data[i][3];
+    temp[4] = data[i][4];
       
-      data[i][0] <<= 1;
-      data[i][1] <<= 1;
-      data[i][2] <<= 1;
-      data[i][3] <<= 1;
-      data[i][4] <<= 1;
+    data[i][0] <<= 1;
+    data[i][1] <<= 1;
+    data[i][2] <<= 1;
+    data[i][3] <<= 1;
+    data[i][4] <<= 1;
       
-      data[i][4] |= ch;
-      temp[4] >>= 7;
-      data[i][3] |= temp[4];
-      temp[3] >>= 7;
-      data[i][2] |= temp[3];
-      temp[2] >>= 7;
-      data[i][1] |= temp[2];
-      temp[1] >>= 7;
-      data[i][0] |= temp[1];
+    data[i][4] |= ch;
+    temp[4] >>= 7;
+    data[i][3] |= temp[4];
+    temp[3] >>= 7;
+    data[i][2] |= temp[3];
+    temp[2] >>= 7;
+    data[i][1] |= temp[2];
+    temp[1] >>= 7;
+    data[i][0] |= temp[1];
       
-    } 
-    sendScreen(data, 150);
-    steps++;  
+  } 
+  sendScreen(data, 150);
+  steps++;  
 }
 
 void roboCop(int timerDelay)
@@ -586,19 +586,19 @@ void cyclops()
 
 void sendScreen(uint8_t data[8][5], int timerDelay)
 {
-    long timer = millis();
-    while(millis() < timer + timerDelay)
+  long timer = millis();
+  while(millis() < timer + timerDelay)
+  {
+    for(int i = 0; i < 8; i++)
     {
-        for(int i = 0; i < 8; i++)
-        {
-            digitalWrite(latchPin, LOW);
-            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][4]);
-            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][3]); 
-            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][2]); 
-            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][1]); 
-            shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][0]); 
-            shiftOut(dataPin, clockPin, LSBFIRST, 1 << i);  
-            digitalWrite(latchPin, HIGH);
-        }
-    }  
+      digitalWrite(latchPin, LOW);
+      shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][4]);
+      shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][3]); 
+      shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][2]); 
+      shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][1]); 
+      shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][0]); 
+      shiftOut(dataPin, clockPin, LSBFIRST, 1 << i);  
+      digitalWrite(latchPin, HIGH);
+    }
+  }  
 }

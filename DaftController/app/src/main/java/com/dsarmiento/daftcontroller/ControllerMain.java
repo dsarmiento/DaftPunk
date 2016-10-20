@@ -87,6 +87,7 @@ public class ControllerMain extends AppCompatActivity {
         final ToggleButton allOn            = (ToggleButton) findViewById(R.id.allOn);
         final ToggleButton allOff           = (ToggleButton) findViewById(R.id.allOff);
         final ToggleButton cyclops          = (ToggleButton) findViewById(R.id.cyclops);
+        final ToggleButton daftPunk          = (ToggleButton) findViewById(R.id.daftPunk);
 
         toggleButtons.add(roboCop);
         toggleButtons.add(heartBeat);
@@ -99,6 +100,7 @@ public class ControllerMain extends AppCompatActivity {
         toggleButtons.add(allOn);
         toggleButtons.add(allOff);
         toggleButtons.add(cyclops);
+        toggleButtons.add(daftPunk);
 
         roboCop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -193,6 +195,15 @@ public class ControllerMain extends AppCompatActivity {
                 if (isChecked) {
                     sendCmd(11);
                     turnOff(cyclops);
+                }
+            }
+        });
+
+        daftPunk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sendCmd(12);
+                    turnOff(daftPunk);
                 }
             }
         });

@@ -154,7 +154,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="10dp"
-                android:id="@+id/toggleButton3"
+                android:id="@+id/daftPunk"
+                android:textOff="@string/daft_punk"
+                android:textOn="@string/daft_punk"
                 style="@style/AppTheme" />
 
             <ToggleButton

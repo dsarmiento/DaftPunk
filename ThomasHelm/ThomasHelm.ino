@@ -50,7 +50,7 @@ void setup()
 }
 
 // For counter option
-int cnt = 0; 
+int cnt = 1000; 
 
 // For marquee option
 int steps = 0;
@@ -76,60 +76,52 @@ void loop()
       message.toCharArray(msg, 256);
       msgLen = message.length();
     }
-    
   }
-  if(option == 0)
-  {
-    countUp(cnt);
-    cnt++;
-  }
-  else if(option == 1)
-  {
-    marquee(msg);
-  }
-  else if(option == 2)
-  {
-    heartBeat();
-  }
-  else if(option == 3)
-  {
-    heartBlink();
-  }
-  else if(option == 4)
-  {
-    roboCop(15);
-  }
-  else if(option == 5)
-  {
-    noise();
-  }
-  else if(option == 6)
-  {
-    eyes();
-  }
-  else if(option == 7)
-  {
-    text(txt);
-  }
-  else if(option == 8)
-  {
-    all(true);
-  }
-  else if(option == 9)
-  {
-    all(false);
-  }
-  else if(option == 10)
-  {
-    pacman();
-  }
-  else if(option == 11)
-  {
-    cyclops();
-  }
-  else if(option == 12)
-  {
-    daftPunk();
+
+  switch(option){
+    case 0:
+      countDown(cnt);
+      cnt--;
+      if(cnt % 100 > 60)
+        cnt = cnt - (cnt % 100) + 59;
+      break;
+    case 1:
+      marquee(msg);
+      break;
+    case 2:
+      heartBeat();
+      break;
+    case 3:
+      heartBlink();
+      break;
+    case 4:
+      roboCop(15);
+      break;
+    case 5:
+      noise();
+      break;
+    case 6:
+      eyes();
+      break;
+    case 7:
+      text(txt);
+      break;
+    case 8:
+      all(true);
+      break;
+    case 10:
+      pacman();
+      break;
+    case 11:
+      cyclops();
+      break;
+    case 12:
+      daftPunk();
+      break;
+    case 9:
+    default:
+      all(false);
+      break;
   }
 }
 
@@ -152,7 +144,7 @@ void daftPunk()
     all(false);
 }
 
-void countUp(int cnt)
+void countDown(int cnt)
 {
   uint8_t data[8][5];
   for(int i = 0; i < 8; i++)

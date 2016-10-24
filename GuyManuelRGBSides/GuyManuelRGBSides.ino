@@ -41,29 +41,49 @@ void setup()
  * 6. 1 bar bouncing back and forth, when it hits the bottom or top it changes color
 */
 void loop() {
-  //setAll(255,0,0);
-  RainbowDrop(200, 500);
+  //Left led values goes from 0-31 (Top to Bot)
+  //Right led values goes from 63-32 (Top to Bot)
+  RainbowDrop(1000, 500);
 }
 
 void RainbowDrop( int SpeedDelay, int ReturnDelay){
   setAll(0,0,0);
-  for(int i = 0; i < (NUM_LEDS-SEGLEN+1)/2; i+=4) {
+  for(int i = 0; i < NUM_LEDS/2; i+=4) {
     for(int j = 0; j < SEGLEN; j++) {
+      //Set left, starts 0-3 then 4-7...
       setPixel(i+j, RAINBOW[(i/4)%8][0], RAINBOW[(i/4)%8][1], RAINBOW[(i/4)%8][2]);
+      //Set right (NUM_LEDS-i-j-1) starts at 63
+      
       setPixel(NUM_LEDS-i-j-1, RAINBOW[(i/4)%8][0], RAINBOW[(i/4)%8][1], RAINBOW[(i/4)%8][2]);  
     }
+    
+    //Turn on
     showStrip();
     delay(SpeedDelay);
   }
 
-   for(int i = NUM_LEDS/2; i > 0; i-=4) {
-    for(int j = 0; j < SEGLEN; j++) {
-      setPixel(i-j, 0, 0, 0); 
-      setPixel(NUM_LEDS-i-j-1, 0, 0, 0);
+  for(int i = (NUM_LEDS/2); i > 0; i-=4) {
+    //left goes from 0 -> 31
+    //right goes from 32 -> 63
+    for(int j = 0; j < 4; j++) {
+      setPixel(i-j-1, 0, 0, 0);
+      setPixel(NUM_LEDS-i+j,0,0,0);
     }
-    showStrip();
-    delay(SpeedDelay);
+      showStrip();
+      delay(SpeedDelay);
   }
+//   for(int i = (NUM_LEDS/2); i > 0; i-=4) {
+//    for(int j = 0; j < SEGLEN; j++) {
+//      Serial.println(i-j-1);
+//      //Set left off
+//      setPixel(i-j-1, 0, 0, 0); 
+//      //Set right off
+//      setPixel(NUM_LEDS-i-j-1, 0, 0, 0);
+//    }
+//    Serial.println();
+//    showStrip();
+//    delay(SpeedDelay);
+//  }
   setAll(0,0,0);
   delay(ReturnDelay);
 }

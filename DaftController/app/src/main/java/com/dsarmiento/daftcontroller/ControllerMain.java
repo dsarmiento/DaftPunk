@@ -17,8 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -37,6 +40,7 @@ public class ControllerMain extends AppCompatActivity {
     private BluetoothSocket mBluetoothSocket;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private boolean isBtConnected = false;
+    private SeekBar delayBar;
 
     private AlertDialog ad;
 
@@ -87,7 +91,18 @@ public class ControllerMain extends AppCompatActivity {
         final ToggleButton allOn            = (ToggleButton) findViewById(R.id.allOn);
         final ToggleButton allOff           = (ToggleButton) findViewById(R.id.allOff);
         final ToggleButton cyclops          = (ToggleButton) findViewById(R.id.cyclops);
-        final ToggleButton daftPunk          = (ToggleButton) findViewById(R.id.daftPunk);
+        final ToggleButton daftPunk         = (ToggleButton) findViewById(R.id.daftPunk);
+
+        final Button centerButton = (Button) findViewById(R.id.center);
+
+        final EditText sendMsg = (EditText) findViewById(R.id.sendMsg);
+
+        delayBar = (SeekBar) findViewById(R.id.delayBar);
+        centerButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v){
+                delayBar.setProgress(50);
+            }
+        });
 
         toggleButtons.add(roboCop);
         toggleButtons.add(heartBeat);
@@ -150,6 +165,8 @@ public class ControllerMain extends AppCompatActivity {
         marqueeText.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    sendCmd(1);
+                    msg(sendMsg.getEditableText().toString().toUpperCase(), Toast.LENGTH_SHORT);
                     turnOff(marqueeText);
                 }
             }
@@ -258,8 +275,26 @@ public class ControllerMain extends AppCompatActivity {
             try {
                 //System.out.println("In sendCmd " + Integer.toString(x));
                 mBluetoothSocket.getOutputStream().write(Integer.toString(x).getBytes());
+                mBluetoothSocket.getOutputStream().write(",".getBytes());
+                mBluetoothSocket.getOutputStream().write(Integer.toString(delayBar.getProgress()).getBytes());
             } catch (IOException e) {}
         }
+        else
+            msg(Integer.toString(delayBar.getProgress()), 0);
+    }
+
+    private void sendMessage(String msg) {
+        msg = msg.toUpperCase();
+        msg += "      ";
+        if(mBluetoothSocket != null) {
+            try {
+                mBluetoothSocket.getOutputStream().write(msg.getBytes());
+            } catch (IOException e) {}
+        }
+    }
+
+    private void msg(String msgToast, int duration){
+        Toast.makeText(getApplicationContext(), msgToast, duration).show();
     }
 
     private void testDialog() {
@@ -317,12 +352,12 @@ public class ControllerMain extends AppCompatActivity {
             if (!ConnectSuccess)
             {
                 finish();
-                Toast.makeText(getApplicationContext(), "Failed to connect", Toast.LENGTH_LONG).show();
+                msg("Failed to connect!", Toast.LENGTH_LONG);
             }
             else
             {
                 isBtConnected = true;
-                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+                msg("Connected", Toast.LENGTH_SHORT);
             }
         }
     }

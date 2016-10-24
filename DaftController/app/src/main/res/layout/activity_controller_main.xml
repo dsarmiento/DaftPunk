@@ -194,7 +194,7 @@
                 android:id="@+id/sendMsg"
                 android:hint="Message"
                 android:layout_width="0dp"
-                android:layout_weight="75"
+                android:layout_weight="80"
                 android:layout_height="55dp"
                 android:maxLines="1" />
 
@@ -203,17 +203,32 @@
                 android:layout_width="0dp"
                 android:id="@+id/sendButton"
                 android:elevation="0dp"
-                android:layout_weight="25"
+                android:layout_weight="20"
                 android:layout_height="55dp" />
 
         </LinearLayout>
-
-        <SeekBar
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
+            android:weightSum="100"
             android:layout_height="0dp"
-            android:id="@+id/delayBar"
-            android:layout_weight="50"
-            android:progress="50" />
+            android:layout_weight="50">
+
+            <SeekBar
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:id="@+id/delayBar"
+                android:layout_weight="80"
+                android:progress="50" />
+
+            <Button
+                android:text="@string/center"
+                android:layout_width="0dp"
+                android:id="@+id/center"
+                android:elevation="0dp"
+                android:layout_weight="20"
+                android:layout_height="55dp" />
+        </LinearLayout>
 
     </LinearLayout>
 

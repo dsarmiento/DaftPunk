@@ -15,15 +15,17 @@
  * 9  All off
  * 10 Pacman
  * 11 Cyclops
+ * 12 Daft Punk
  */
 
 #include "Const.h" 
 #include <SoftwareSerial.h>
 
 // Connected pins
-#define latchPin 8  //Pin connected to ST_CP of 74HC595
-#define clockPin 12 //Pin connected to SH_CP of 74HC595
-#define dataPin 11  //Pin connected to DS of 74HC595
+#define latchPin 8  // Pin connected to ST_CP of 74HC595
+#define clockPin 12 // Pin connected to SH_CP of 74HC595
+#define dataPin 11  // Pin connected to DS of 74HC595
+#define SPEED_UP 4  // x4 speed up and x1/4 speed down
 
 int option = 9;
 boolean flag = true;
@@ -39,14 +41,7 @@ void setup()
   pinMode(dataPin, OUTPUT);
   digitalWrite(latchPin, HIGH);
   Serial.begin(9600);
-  bluetooth.begin(115200);
-  bluetooth.print("$$$");
-  delay(100);
-  bluetooth.println("U,9600,N");
-  bluetooth.print("---");
-  bluetooth.end();
   bluetooth.begin(9600);
-  bluetooth.print("---");
 }
 
 // For counter option
@@ -55,10 +50,12 @@ int cnt = 1000;
 // For marquee option
 int steps = 0;
 byte temp[5];
-byte ch;
+byte data[8][5];
+
 char msg[256] = "HUMAN      "; // HELLO WORLD
 char txt[6]   = "HUMAN";
 int msgLen = 0;
+int setDelay = 50;
 
 void loop()
 {
@@ -66,7 +63,10 @@ void loop()
   if(bluetooth.available() > 0)
   {
     option = bluetooth.parseInt();
+    setDelay = bluetooth.parseInt();
+    
     Serial.println(option);
+    Serial.println(setDelay);
     if(option == 1)
     {
       flag = true;
@@ -146,7 +146,6 @@ void daftPunk()
 
 void countDown(int cnt)
 {
-  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
     for(int j = 0; j < 5; j++)
       data[i][j] = 0x00;
@@ -165,30 +164,30 @@ void countDown(int cnt)
   // Go through the rows
   for(int i = 0; i < 8; i++)
   {
-  byte temp = 0;
+  temp[0] = 0;
       
-  temp = numbers[digits[0]][i] >> 1;
-  data[i][0] = temp;
+  temp[0] = numbers[digits[0]][i] >> 1;
+  data[i][0] = temp[0];
       
-  temp = 0;
-  temp = numbers[digits[0]][i] << 7;
-  temp |= numbers[digits[1]][i] >> 2;
-  data[i][1] = temp;
+  temp[0] = 0;
+  temp[0] = numbers[digits[0]][i] << 7;
+  temp[0] |= numbers[digits[1]][i] >> 2;
+  data[i][1] = temp[0];
       
-  temp = 0;
-  temp = numbers[digits[1]][i] << 6;
-  temp |= colon[i];
-  temp |= numbers[digits[2]][i] >> 6;
-  data[i][2] = temp;
+  temp[0] = 0;
+  temp[0] = numbers[digits[1]][i] << 6;
+  temp[0] |= colon[i];
+  temp[0] |= numbers[digits[2]][i] >> 6;
+  data[i][2] = temp[0];
       
-  temp = 0;
-  temp = numbers[digits[2]][i] << 2;
-  temp |= numbers[digits[3]][i] >> 7;
-  data[i][3] = temp;
+  temp[0] = 0;
+  temp[0] = numbers[digits[2]][i] << 2;
+  temp[0] |= numbers[digits[3]][i] >> 7;
+  data[i][3] = temp[0];
       
-  temp = 0;
-  temp = numbers[digits[3]][i] << 1;
-  data[i][4] = temp;
+  temp[0] = 0;
+  temp[0] = numbers[digits[3]][i] << 1;
+  data[i][4] = temp[0];
       
       
   }
@@ -198,7 +197,6 @@ void countDown(int cnt)
 
 void marquee(char msg[])
 {
-  uint8_t data[8][5];
   if(flag)
   {
     flag = false;
@@ -208,7 +206,7 @@ void marquee(char msg[])
   }
       
   for(int i = 0; i < 8; i++){
-    ch = 0;
+    byte ch = 0;
     if(steps % 6 != 5){  
       int pos = 4 - (steps % 6);
       if(msg[(steps/6)%msgLen] != ' '){
@@ -249,10 +247,8 @@ void marquee(char msg[])
 
 void roboCop(int timerDelay)
 {
-  uint8_t data[8][5];
+  
   uint8_t robo[5] = {0xF0, 0x00, 0x00, 0x00, 0x00};
-  uint8_t temp[5];
-
   for(int i = 0; i < 36; i++)
   {
     temp[0] = robo[0] & 0x01;
@@ -316,7 +312,6 @@ void roboCop(int timerDelay)
 
 void heartBeat()
 {
-  uint8_t data[8][5];
   uint8_t mask[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
   for(int j = 0; j < 40; j++)
   {
@@ -335,7 +330,6 @@ void heartBeat()
 
 void heartBlink()
 {
-  uint8_t data[8][5];
   if((millis()/500) % 2 == 0)
   {
     for(int i = 0; i < 8; i++)
@@ -355,7 +349,6 @@ void heartBlink()
   {
     for(int i = 0; i < 8; i++)
     {
-
       data[i][0]  = heartFull[i][0];
       data[i][1]  = heartFull[i][1];
       data[i][1] |= heartFull[i][0] >> 7;
@@ -372,7 +365,6 @@ void heartBlink()
 
 void noise()
 {
-  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
     for(int j = 0; j < 5; j++)
@@ -385,7 +377,6 @@ void noise()
 
 void eyes()
 {
-  uint8_t data[8][5];
   for(int k = 0; k < 4; k++)
   {
     for(int i = 0; i < 8; i++)
@@ -417,7 +408,6 @@ void eyes()
 
 void text(char txt[6])
 {
-  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
     if(msg[0] != ' ')
@@ -478,7 +468,6 @@ void text(char txt[6])
 
 void all(boolean x)
 {
-  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
     for(int j = 0; j < 5; j++)
@@ -494,8 +483,6 @@ void all(boolean x)
 
 void pacman()
 {
-  uint8_t data[8][5];
-  uint8_t temp;
   for(int i = 0; i < 48; i++)
   {
     int k = 0;
@@ -564,13 +551,12 @@ void pacman()
       }
 
     }
-    sendScreen(data, 100);
+    sendScreen(data, 50);
   }
 }
 
 void cyclops()
 {
-  uint8_t data[8][5];
   for(int i = 0; i < 8; i++)
   {
     for(int j = 0; j < 5; j++)
@@ -587,6 +573,7 @@ void cyclops()
 void sendScreen(uint8_t data[8][5], int timerDelay)
 {
   long timer = millis();
+  timerDelay = map(setDelay, 0, 100, timerDelay*SPEED_UP, timerDelay/SPEED_UP);
   while(millis() < timer + timerDelay)
   {
     for(int i = 0; i < 8; i++)

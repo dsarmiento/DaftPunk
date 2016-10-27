@@ -21,6 +21,8 @@
 #include "Const.h" 
 #include <SoftwareSerial.h>
 
+#define DEBUG false
+
 // Connected pins
 #define latchPin 8  // Pin connected to ST_CP of 74HC595
 #define clockPin 12 // Pin connected to SH_CP of 74HC595
@@ -40,8 +42,11 @@ void setup()
   pinMode(clockPin, OUTPUT);
   pinMode(dataPin, OUTPUT);
   digitalWrite(latchPin, HIGH);
-  Serial.begin(9600);
   bluetooth.begin(9600);
+  
+  #if DEBUG
+  Serial.begin(9600);
+  #endif
 }
 
 // For counter option
@@ -65,16 +70,41 @@ void loop()
     option = bluetooth.parseInt();
     setDelay = bluetooth.parseInt();
     
+    #if DEBUG
     Serial.println(option);
     Serial.println(setDelay);
-    if(option == 1)
+    #endif
+    
+    if(option == 1 || option == 7)
     {
       flag = true;
-      Serial.print("OK");
-      while(Serial.available() == 0);
-      String message = Serial.readString();
-      message.toCharArray(msg, 256);
-      msgLen = message.length();
+      delay(500);
+
+        String message = bluetooth.readString();
+        
+        if(option == 1)
+          message += "      ";
+        
+        message.toCharArray(msg, 256);
+        msgLen = message.length();
+        
+        if(option == 7 && msgLen <= 6)
+        {
+          for(int i = 0; i < 6; i++)
+            txt[i] = ' ';
+          for(int i = (6 - msgLen)/2; i < msgLen + (6 - msgLen)/2; i++)
+          {
+            txt[i] = msg[i - (6 - msgLen)/2];
+          }
+        }
+
+        if(message.length() == 0)
+        {
+          all(true, 250);
+          all(false, 250);
+          all(true, 250);
+          option = 9;
+        }
     }
   }
 
@@ -107,7 +137,7 @@ void loop()
       text(txt);
       break;
     case 8:
-      all(true);
+      all(true, 50);
       break;
     case 10:
       pacman();
@@ -120,7 +150,7 @@ void loop()
       break;
     case 9:
     default:
-      all(false);
+      all(false, 50);
       break;
   }
 }
@@ -133,7 +163,7 @@ void daftPunk()
     
   timer = millis();
   while(millis() < timer + 250)
-    all(false);
+    all(false, 50);
     
   timer = millis();
   while(millis() < timer + 750)
@@ -141,7 +171,7 @@ void daftPunk()
     
   timer = millis();
   while(millis() < timer + 250)
-    all(false);
+    all(false, 50);
 }
 
 void countDown(int cnt)
@@ -377,96 +407,187 @@ void noise()
 
 void eyes()
 {
-  for(int k = 0; k < 4; k++)
+  if(random(15) == 0)
   {
-    for(int i = 0; i < 8; i++)
+    for(int k = 0; k < 4; k++)
     {
-      data[i][0] = 0x00;
-      data[i][1] = blinking[k][i];
-      data[i][2] = 0x00;
-      data[i][3] = blinking[k][i];
-      data[i][4] = 0x00;
+      for(int i = 0; i < 8; i++)
+      {
+        data[i][0] = 0x00;
+        data[i][1] = blinking[k][i];
+        data[i][2] = 0x00;
+        data[i][3] = blinking[0][i];
+        data[i][4] = 0x00;
+      }
+      if(k == 0)
+        sendScreen(data, random(5) * 1000);
+      else
+        sendScreen(data, 100);
     }
-    if(k == 0)
-      sendScreen(data, random(5) * 1000);
-    else
+    for(int k = 3; k > 0; k--)
+    {
+      for(int i = 0; i < 8; i++)
+      {
+        data[i][0] = 0x00;
+        data[i][1] = blinking[k][i];
+        data[i][2] = 0x00;
+        data[i][3] = blinking[0][i];
+        data[i][4] = 0x00;
+      }
       sendScreen(data, 100);
-  }
-  for(int k = 3; k > 0; k--)
-  {
-    for(int i = 0; i < 8; i++)
-    {
-      data[i][0] = 0x00;
-      data[i][1] = blinking[k][i];
-      data[i][2] = 0x00;
-      data[i][3] = blinking[k][i];
-      data[i][4] = 0x00;
     }
-    sendScreen(data, 100);
   }
+  else
+  {
+    for(int k = 0; k < 4; k++)
+    {
+      for(int i = 0; i < 8; i++)
+      {
+        data[i][0] = 0x00;
+        data[i][1] = blinking[k][i];
+        data[i][2] = 0x00;
+        data[i][3] = blinking[k][i];
+        data[i][4] = 0x00;
+      }
+      if(k == 0)
+        sendScreen(data, random(5) * 1000);
+      else
+        sendScreen(data, 100);
+    }
+    for(int k = 3; k > 0; k--)
+    {
+      for(int i = 0; i < 8; i++)
+      {
+        data[i][0] = 0x00;
+        data[i][1] = blinking[k][i];
+        data[i][2] = 0x00;
+        data[i][3] = blinking[k][i];
+        data[i][4] = 0x00;
+      }
+      sendScreen(data, 100);
+    }
+  }
+  
+
 }
 
 void text(char txt[6])
 {
-  for(int i = 0; i < 8; i++)
-  {
-    if(msg[0] != ' ')
+  if(msgLen % 2 == 0){
+    for(int i = 0; i < 8; i++)
     {
-      data[i][0]  = alphabet[txt[0] - 'A'][i];
-    }
-    else
-    {
-      data[i][0]  = 0x00;
-    }
-    if(msg[1] != ' ')
-    {
-      data[i][1]  = alphabet[txt[1] - 'A'][i] << 2;
-    }
-    else
-    {
-      data[i][1]  = 0x00;
-    }
-    if(msg[2] != ' ')
-    {
-      data[i][1] |= alphabet[txt[2] - 'A'][i] >> 4;
-      data[i][2]  = alphabet[txt[2] - 'A'][i] << 4;
-    }
-    else
-    {
-      data[i][1] &= ~0x03;
-      data[i][2]  = 0x00; 
-    }
-    if(msg[3] != ' ')
-    {
-      data[i][2] |= alphabet[txt[3] - 'A'][i] >> 2;
-      data[i][3]  = alphabet[txt[3] - 'A'][i] << 6;
-    }
-    else
-    {
-      data[i][2] &= ~0x0F;
-      data[i][3]  = 0x00;
-    }
-    if(msg[4] != ' ')
-    {
-      data[i][3] |= alphabet[txt[4] - 'A'][i];
-    }
-    else
-    {
-      data[i][3] &= ~0x3F;
-    }
-    if(msg[5] != ' ')
-    {
-      data[i][4]  = alphabet[txt[5] - 'A'][i] << 2;
-    }
-    else
-    {
-      data[i][4]  = 0x00;
+      if(txt[0] != ' ')
+      {
+        data[i][0]  = alphabet[txt[0] - 'A'][i];
+      }
+      else
+      {
+        data[i][0]  = 0x00;
+      }
+      if(txt[1] != ' ')
+      {
+        data[i][1]  = alphabet[txt[1] - 'A'][i] << 2;
+      }
+      else
+      {
+        data[i][1]  = 0x00;
+      }
+      if(txt[2] != ' ')
+      {
+        data[i][1] |= alphabet[txt[2] - 'A'][i] >> 4;
+        data[i][2]  = alphabet[txt[2] - 'A'][i] << 4;
+      }
+      else
+      {
+        data[i][1] &= ~0x03;
+        data[i][2]  =  0x00; 
+      }
+      if(txt[3] != ' ')
+      {
+        data[i][2] |= alphabet[txt[3] - 'A'][i] >> 2;
+        data[i][3]  = alphabet[txt[3] - 'A'][i] << 6;
+      }
+      else
+      {
+        data[i][2] &= ~0x0F;
+        data[i][3]  =  0x00;
+      }
+      if(txt[4] != ' ')
+      {
+        data[i][3] |= alphabet[txt[4] - 'A'][i];
+      }
+      else
+      {
+        data[i][3] &= ~0x3F;
+      }
+      if(txt[5] != ' ')
+      {
+        data[i][4]  = alphabet[txt[5] - 'A'][i] << 2;
+      }
+      else
+      {
+        data[i][4]  = 0x00;
+      }
     }
   }
+  else{
+    for(int i = 0; i < 8; i++)
+    {
+      if(txt[0] != ' ')
+      {
+        data[i][0] = alphabet[txt[0] - 'A'][i] >> 3;
+        data[i][1] = alphabet[txt[0] - 'A'][i] << 5;
+      }
+      else
+      {
+        data[i][0] = 0x00;
+        data[i][1] = 0x00;
+      }
+      if(txt[1] != ' ')
+      {
+        data[i][1] |= alphabet[txt[1] - 'A'][i] >> 1;
+        data[i][2]  = alphabet[txt[1] - 'A'][i] << 7;
+      }
+      else
+      {
+        data[i][1] &= ~0x1F;
+        data[i][2]  =  0x00;
+      }
+      if(txt[2] != ' ')
+      {
+        data[i][2] |= alphabet[txt[2] - 'A'][i] << 1;
+      }
+      else
+      {
+        data[i][2] &= ~0x7E;
+      }
+      if(txt[3] != ' ')
+      {
+        data[i][2] |= alphabet[txt[3] - 'A'][i] >> 5;
+        data[i][3]  = alphabet[txt[3] - 'A'][i] << 3;
+      }
+      else
+      {
+        data[i][2] &= ~0x01;
+        data[i][3]  =  0x00;
+      }
+      if(txt[4] != ' ')
+      {
+        data[i][3] |= alphabet[txt[4] - 'A'][i] >> 3;
+        data[i][4]  = alphabet[txt[4] - 'A'][i] << 5;
+      }
+      else
+      {
+        data[i][3] &= ~0x07;
+        data[i][4]  = 0x00;
+      }
+    }
+  }
+  
   sendScreen(data, 50);
 }
 
-void all(boolean x)
+void all(boolean x, uint8_t delay)
 {
   for(int i = 0; i < 8; i++)
   {
@@ -478,7 +599,7 @@ void all(boolean x)
         data[i][j] = 0x00;
     }
   }
-  sendScreen(data, 50);
+  sendScreen(data, delay);
 }
 
 void pacman()
@@ -573,7 +694,26 @@ void cyclops()
 void sendScreen(uint8_t data[8][5], int timerDelay)
 {
   long timer = millis();
-  timerDelay = map(setDelay, 0, 100, timerDelay*SPEED_UP, timerDelay/SPEED_UP);
+  #if DEBUG
+  Serial.print(timerDelay);
+  Serial.print("\t");
+  #endif
+  if(setDelay <  50)
+  {
+    timerDelay = map(setDelay, 0, 49, timerDelay*SPEED_UP, timerDelay);
+  }
+  else
+  {
+    timerDelay = map(setDelay, 50, 100, timerDelay, timerDelay/SPEED_UP);
+    if(timerDelay < 8)
+      timerDelay = 8;
+  }
+  
+  #if DEBUG
+  Serial.print(setDelay);
+  Serial.print("\t");
+  Serial.println(timerDelay);
+  #endif
   while(millis() < timer + timerDelay)
   {
     for(int i = 0; i < 8; i++)
@@ -584,7 +724,7 @@ void sendScreen(uint8_t data[8][5], int timerDelay)
       shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][2]); 
       shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][1]); 
       shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][0]); 
-      shiftOut(dataPin, clockPin, LSBFIRST, 1 << i);  
+      shiftOut(dataPin, clockPin, MSBFIRST, 1 << i);  
       digitalWrite(latchPin, HIGH);
     }
   }  

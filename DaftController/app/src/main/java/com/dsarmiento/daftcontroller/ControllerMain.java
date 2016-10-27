@@ -166,7 +166,7 @@ public class ControllerMain extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     sendCmd(1);
-                    msg(sendMsg.getEditableText().toString().toUpperCase(), Toast.LENGTH_SHORT);
+                    sendMessage(sendMsg.getEditableText().toString());
                     turnOff(marqueeText);
                 }
             }
@@ -176,6 +176,10 @@ public class ControllerMain extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     turnOff(staticText);
+                    if(sendMsg.getEditableText().toString().length() <= 6)
+                        sendMessage(sendMsg.getEditableText().toString());
+                    else
+                        msg("Too long", Toast.LENGTH_SHORT);
                 }
             }
         });
@@ -285,7 +289,6 @@ public class ControllerMain extends AppCompatActivity {
 
     private void sendMessage(String msg) {
         msg = msg.toUpperCase();
-        msg += "      ";
         if(mBluetoothSocket != null) {
             try {
                 mBluetoothSocket.getOutputStream().write(msg.getBytes());

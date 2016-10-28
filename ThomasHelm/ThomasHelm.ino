@@ -93,9 +93,7 @@ void loop()
           for(int i = 0; i < 6; i++)
             txt[i] = ' ';
           for(int i = (6 - msgLen)/2; i < msgLen + (6 - msgLen)/2; i++)
-          {
             txt[i] = msg[i - (6 - msgLen)/2];
-          }
         }
 
         if(message.length() == 0)
@@ -155,15 +153,12 @@ void loop()
   }
 }
 
+
 void daftPunk()
 {
     text(" DAFT ", 750);
-
     all(false, 250);
-    
-
     text(" PUNK ", 750);
-
     all(false, 250);
 }
 
@@ -179,10 +174,10 @@ void countDown(int cnt)
 
   // Grab the digits
   int digits[4]; // Digits in time 01:23
-  digits[0] = cnt/1000;
-  digits[1] = (cnt/100)%10;
-  digits[2] = (cnt/10)%10;
-  digits[3] = cnt%10;
+  digits[0] = cnt / 1000;
+  digits[1] = (cnt / 100) % 10;
+  digits[2] = (cnt / 10) % 10;
+  digits[3] = cnt % 10;
 
   // Go through the rows
   for(int i = 0; i < 8; i++)
@@ -234,8 +229,8 @@ void marquee(char msg[])
     byte ch = 0;
     if(steps % 6 != 5){  
       int pos = 4 - (steps % 6);
-      if(msg[(steps/6)%msgLen] != ' '){
-        ch = alphabet[msg[(steps/6)%msgLen] - 'A'][i];
+      if(msg[(steps / 6) % msgLen] != ' '){
+        ch = alphabet[msg[(steps / 6) % msgLen] - 'A'][i];
         ch >>= pos;
         ch &= 0x01;
       }else{
@@ -351,6 +346,20 @@ void heartBeat()
     }
     sendScreen(data, 25);
   }
+  uint8_t mask[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
+  for(int j = 0; j < 40; j++)
+  {
+    mask[j / 8] |= 1 << 7 - (j % 8);
+    for(int i = 0; i < 8; i++)
+    {
+      data[i][0] = heartbeat[i][0] & ~mask[0];
+      data[i][1] = heartbeat[i][1] & ~mask[1];
+      data[i][2] = heartbeat[i][2] & ~mask[2];
+      data[i][3] = heartbeat[i][3] & ~mask[3];
+      data[i][4] = heartbeat[i][4] & ~mask[4];
+    }
+    sendScreen(data, 25);
+  }
 }
 
 void heartBlink()
@@ -392,12 +401,8 @@ void heartBlink()
 void noise()
 {
   for(int i = 0; i < 8; i++)
-  {
     for(int j = 0; j < 5; j++)
-    {
       data[i][j] = random(256);
-    }
-  }
   sendScreen(data, 50);
 }
 
@@ -622,50 +627,44 @@ void pacman()
     for(int j = 0; j < 8; j++)
     {
       if(i < 8)
-        data[j][0] = pacMan[k][j] << 7 - (i%8);
+        data[j][0] = pacMan[k][j] << 7 - (i % 8);
       else if(i < 16)
-        data[j][0] = pacMan[k][j] >> i%8;
+        data[j][0] = pacMan[k][j] >> i % 8;
       else
         data[j][0] = 0x00;
 
       if(i >= 8 && i < 16)
-        data[j][1] = pacMan[k][j] << 7 - (i%8);
+        data[j][1] = pacMan[k][j] << 7 - (i % 8);
       else if(i >= 16 && i < 24)
-        data[j][1] = pacMan[k][j] >> i%8;
+        data[j][1] = pacMan[k][j] >> i % 8;
       else
         data[j][1] = 0x00;
 
       if(i >=16 && i < 24)
-        data[j][2] = pacMan[k][j] << 7 - (i%8);
+        data[j][2] = pacMan[k][j] << 7 - (i % 8);
       else if(i >= 24 && i < 32)
-        data[j][2] = pacMan[k][j] >> i%8;
+        data[j][2] = pacMan[k][j] >> i % 8;
       else
         data[j][2] = 0x00;
 
       if(i >= 24 && i < 32)
-        data[j][3] = pacMan[k][j] << 7 - (i%8);
+        data[j][3] = pacMan[k][j] << 7 - (i % 8);
       else if(i >= 32 && i < 40)
-        data[j][3] = pacMan[k][j] >> i%8;
+        data[j][3] = pacMan[k][j] >> i % 8;
       else
         data[j][3] = 0x00;
 
       if(i >= 32 && i < 40)
-        data[j][4] = pacMan[k][j] << 7 - (i%8);
+        data[j][4] = pacMan[k][j] << 7 - (i % 8);
       else if(i >= 40)
-        data[j][4] = pacMan[k][j] >> i%8;
+        data[j][4] = pacMan[k][j] >> i % 8;
       else
         data[j][4] = 0x00;
 
       if(j == 3 || j == 4)
-      {
         for(int dot = 0; dot < 5; dot++)
-        {
-          if(dot >= (i / 8))
-          {
+          if(dot >= (i / 8) || dot < (i / 8) - 1)
             data[j][dot] |= 0x18;
-          }
-        }
-      }
 
     }
     sendScreen(data, 50);
@@ -710,6 +709,7 @@ void sendScreen(uint8_t data[8][5], int timerDelay)
   Serial.print("\t");
   Serial.println(timerDelay);
   #endif
+  
   while(millis() < timer + timerDelay)
   {
     for(int i = 0; i < 8; i++)

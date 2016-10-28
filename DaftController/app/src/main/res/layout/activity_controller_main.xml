@@ -194,17 +194,9 @@
                 android:id="@+id/sendMsg"
                 android:hint="Message"
                 android:layout_width="0dp"
-                android:layout_weight="80"
+                android:layout_weight="100"
                 android:layout_height="55dp"
                 android:maxLines="1" />
-
-            <Button
-                android:text="Send"
-                android:layout_width="0dp"
-                android:id="@+id/sendButton"
-                android:elevation="0dp"
-                android:layout_weight="20"
-                android:layout_height="55dp" />
 
         </LinearLayout>
         <LinearLayout

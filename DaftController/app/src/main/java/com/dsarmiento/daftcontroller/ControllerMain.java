@@ -1,7 +1,5 @@
 package com.dsarmiento.daftcontroller;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -41,7 +39,6 @@ public class ControllerMain extends AppCompatActivity {
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private boolean isBtConnected = false;
     private SeekBar delayBar;
-
     private AlertDialog ad;
 
     @Override
@@ -92,12 +89,10 @@ public class ControllerMain extends AppCompatActivity {
         final ToggleButton allOff           = (ToggleButton) findViewById(R.id.allOff);
         final ToggleButton cyclops          = (ToggleButton) findViewById(R.id.cyclops);
         final ToggleButton daftPunk         = (ToggleButton) findViewById(R.id.daftPunk);
-
-        final Button centerButton = (Button) findViewById(R.id.center);
-
-        final EditText sendMsg = (EditText) findViewById(R.id.sendMsg);
-
+        final Button centerButton           = (Button) findViewById(R.id.center);
+        final EditText sendMsg              = (EditText) findViewById(R.id.sendMsg);
         delayBar = (SeekBar) findViewById(R.id.delayBar);
+
         centerButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v){
                 delayBar.setProgress(50);
@@ -165,9 +160,12 @@ public class ControllerMain extends AppCompatActivity {
         marqueeText.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    sendCmd(1);
-                    sendMessage(sendMsg.getEditableText().toString());
                     turnOff(marqueeText);
+                    sendCmd(1);
+                    if(sendMsg.getEditableText().toString().length() <= 256)
+                        sendMessage(sendMsg.getEditableText().toString());
+                    else
+                        msg("Too long", Toast.LENGTH_SHORT);
                 }
             }
         });
@@ -176,6 +174,7 @@ public class ControllerMain extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     turnOff(staticText);
+                    sendCmd(7);
                     if(sendMsg.getEditableText().toString().length() <= 6)
                         sendMessage(sendMsg.getEditableText().toString());
                     else
@@ -269,15 +268,12 @@ public class ControllerMain extends AppCompatActivity {
 
             mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(address);
             new ConnectBT().execute();
-
-
         }
     };
 
     private void sendCmd(int x) {
         if(mBluetoothSocket != null) {
             try {
-                //System.out.println("In sendCmd " + Integer.toString(x));
                 mBluetoothSocket.getOutputStream().write(Integer.toString(x).getBytes());
                 mBluetoothSocket.getOutputStream().write(",".getBytes());
                 mBluetoothSocket.getOutputStream().write(Integer.toString(delayBar.getProgress()).getBytes());
@@ -347,6 +343,7 @@ public class ControllerMain extends AppCompatActivity {
             }
             return null;
         }
+
         @Override
         protected void onPostExecute(Void result) //after the doInBackground, it checks if everything went fine
         {
@@ -364,5 +361,4 @@ public class ControllerMain extends AppCompatActivity {
             }
         }
     }
-
 }

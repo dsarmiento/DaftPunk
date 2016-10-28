@@ -134,7 +134,7 @@ void loop()
       eyes();
       break;
     case 7:
-      text(txt);
+      text(txt, 50);
       break;
     case 8:
       all(true, 50);
@@ -157,21 +157,14 @@ void loop()
 
 void daftPunk()
 {
-  long timer = millis();
-  while(millis() < timer + 750)
-    text(" DAFT ");
+    text(" DAFT ", 750);
+
+    all(false, 250);
     
-  timer = millis();
-  while(millis() < timer + 250)
-    all(false, 50);
-    
-  timer = millis();
-  while(millis() < timer + 750)
-    text(" PUNK ");
-    
-  timer = millis();
-  while(millis() < timer + 250)
-    all(false, 50);
+
+    text(" PUNK ", 750);
+
+    all(false, 250);
 }
 
 void countDown(int cnt)
@@ -230,11 +223,13 @@ void marquee(char msg[])
   if(flag)
   {
     flag = false;
+    steps = 0;
     for(int i = 0; i < 8; i++)
       for(int j = 0; j < 5; j++)
         data[i][j] = 0x00;
+    sendScreen(data, 50);
   }
-      
+  
   for(int i = 0; i < 8; i++){
     byte ch = 0;
     if(steps % 6 != 5){  
@@ -360,7 +355,8 @@ void heartBeat()
 
 void heartBlink()
 {
-  if((millis()/500) % 2 == 0)
+  cnt++;
+  if(cnt % 2 == 0)
   {
     for(int i = 0; i < 8; i++)
     {
@@ -390,7 +386,7 @@ void heartBlink()
       data[i][4] |= heartFull[i][1] >> 6;
     }
   }
-  sendScreen(data, 50);
+  sendScreen(data, 500);
 }
 
 void noise()
@@ -471,7 +467,7 @@ void eyes()
 
 }
 
-void text(char txt[6])
+void text(char txt[6], int delay)
 {
   if(msgLen % 2 == 0){
     for(int i = 0; i < 8; i++)
@@ -584,7 +580,7 @@ void text(char txt[6])
     }
   }
   
-  sendScreen(data, 50);
+  sendScreen(data, delay);
 }
 
 void all(boolean x, uint8_t delay)
@@ -705,8 +701,8 @@ void sendScreen(uint8_t data[8][5], int timerDelay)
   else
   {
     timerDelay = map(setDelay, 50, 100, timerDelay, timerDelay/SPEED_UP);
-    if(timerDelay < 8)
-      timerDelay = 8;
+    if(timerDelay < 5)
+      timerDelay = 5;
   }
   
   #if DEBUG

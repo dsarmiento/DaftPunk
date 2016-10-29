@@ -20,6 +20,8 @@
 
 #include "Const.h" 
 #include <SoftwareSerial.h>
+#include<FastLED.h>
+
 
 #define DEBUG false
 
@@ -28,11 +30,18 @@
 #define clockPin 12 // Pin connected to SH_CP of 74HC595
 #define dataPin 11  // Pin connected to DS of 74HC595
 #define SPEED_UP 4  // x4 speed up and x1/4 speed down
+#define NUM_LEDS 8
 
-int option = 9;
+int option = 4;
+int earCnt = 1;
+long earTimer = 0;
 boolean flag = true;
 
+
 SoftwareSerial bluetooth = SoftwareSerial(2,3);
+CRGB earLeds[NUM_LEDS];
+CRGBPalette16 currentPalette = PartyColors_p;
+TBlendType    currentBlending = LINEARBLEND;
 
 // First time setup
 void setup() 
@@ -43,7 +52,11 @@ void setup()
   pinMode(dataPin, OUTPUT);
   digitalWrite(latchPin, HIGH);
   bluetooth.begin(9600);
+
   
+  FastLED.addLeds<WS2811, 5, GRB>(earLeds, NUM_LEDS).setCorrection( TypicalLEDStrip ); 
+  FastLED.addLeds<WS2811, 7, GRB>(earLeds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+
   #if DEBUG
   Serial.begin(9600);
   #endif
@@ -61,9 +74,12 @@ char msg[256] = "HUMAN      "; // HELLO WORLD
 char txt[6]   = "HUMAN";
 int msgLen = 0;
 int setDelay = 50;
+static uint8_t colorIndex = 0;
 
 void loop()
 {
+  
+    colorIndex = colorIndex + 1; /* motion speed */
   // Check serial for new request
   if(bluetooth.available() > 0)
   {
@@ -346,7 +362,10 @@ void heartBeat()
     }
     sendScreen(data, 25);
   }
-  uint8_t mask[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
+  
+  for(int i = 0; i < 5; i++)
+    mask[i] = 0x00;
+    
   for(int j = 0; j < 40; j++)
   {
     mask[j / 8] |= 1 << 7 - (j % 8);
@@ -712,6 +731,7 @@ void sendScreen(uint8_t data[8][5], int timerDelay)
   
   while(millis() < timer + timerDelay)
   {
+    
     for(int i = 0; i < 8; i++)
     {
       digitalWrite(latchPin, LOW);
@@ -722,6 +742,23 @@ void sendScreen(uint8_t data[8][5], int timerDelay)
       shiftOut(dataPin, clockPin, LSBFIRST, ~data[i][0]); 
       shiftOut(dataPin, clockPin, MSBFIRST, 1 << i);  
       digitalWrite(latchPin, HIGH);
+    
+      if(millis() > earTimer + 10)
+      {
+        earTimer = millis();
+        earLeds[i] = ColorFromPalette( currentPalette, colorIndex, 255, currentBlending);
+        colorIndex += 3;
+        FastLED.show();
+      }
     }
   }  
 }
+
+void FillLEDsFromPaletteColors( uint8_t colorIndex)
+{
+    uint8_t brightness = 255;
+    for( int i = 0; i < NUM_LEDS; i++) {
+        
+    }
+}
+

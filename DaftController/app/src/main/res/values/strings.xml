@@ -7,4 +7,12 @@
     <string name="white_noise">Random</string>
     <string name="static_text">Text</string>
     <string name="blinking_eyes">Eyes</string>
+    <string name="all_off">All Off</string>
+    <string name="all_on">All On</string>
+    <string name="pac_man">PacMan</string>
+    <string name="cyclops">Cyclops</string>
+    <string name="daft_punk">DaftPunk</string>
+    <string name="center">x1</string>
+
+    <string name="action_connect">Connect</string>
 </resources>
